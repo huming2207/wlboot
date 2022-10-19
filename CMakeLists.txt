@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.20)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/external/stm32-cmake/cmake/stm32_gcc.cmake")
 set(STM32_CUBE_WL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/STM32CubeWL")
@@ -21,4 +21,5 @@ target_link_libraries(wlboot PRIVATE
         STM32::Nano
 )
 stm32_print_size_of_target(wlboot)
-stm32_
+target_link_options(wlboot PUBLIC -lc -lrdimon --specs=rdimon.specs)
+stm32_add_linker_script(wlboot PRIVATE misc/WL54CC_M4.ld)

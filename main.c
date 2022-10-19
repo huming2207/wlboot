@@ -6,6 +6,8 @@
 #include <stm32wlxx_ll_system.h>
 #include <stm32wlxx_ll_utils.h>
 
+extern void initialise_monitor_handles(void);
+
 static void setup_clock()
 {
     LL_FLASH_SetLatency(LL_FLASH_LATENCY_2);
@@ -44,7 +46,9 @@ static void setup_clock()
 
 int main()
 {
+    initialise_monitor_handles();
     setup_clock();
+
     printf("Hello, World!\n");
     return 0;
 }
