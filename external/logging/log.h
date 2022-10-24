@@ -1,7 +1,5 @@
 #pragma once
 
-#include "printf/printf.h"
-
 #if defined(__cplusplus) && (__cplusplus >  201703L)
 #define WLB_LOG(text, ...) \
     do {                    \

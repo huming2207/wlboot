@@ -1,8 +1,15 @@
-//
-// Created by hu on 21/10/22.
-//
+#pragma once
 
-#ifndef WLBOOT_UART_HPP
-#define WLBOOT_UART_HPP
+#include <cstdint>
+#include <cstddef>
 
-#endif //WLBOOT_UART_HPP
+class uart
+{
+public:
+    virtual bool init() = 0;
+    virtual bool transmit(uint8_t *buf, size_t len) = 0;
+    virtual void on_pkt_recv(uint8_t *buf, size_t len) = 0;
+    virtual void set_tx(bool enable) = 0;
+    virtual void set_rx(bool enable) = 0;
+    virtual void handle_task() = 0;
+};

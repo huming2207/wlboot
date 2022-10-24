@@ -1,8 +1,12 @@
-//
-// Created by hu on 22/10/22.
-//
+#pragma once
 
-#ifndef WLBOOT_INTR_HANDLER_H
-#define WLBOOT_INTR_HANDLER_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif //WLBOOT_INTR_HANDLER_H
+void LPUART1_IRQHandler(void);
+void USART1_IRQHandler(void);
+
+#ifdef __cplusplus
+}
+#endif

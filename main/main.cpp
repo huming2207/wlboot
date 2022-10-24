@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdint.h>
+#include <cstdio>
+#include <cstdint>
 #include <stm32wle5xx.h>
 #include <stm32wlxx_ll_rcc.h>
 #include <stm32wlxx_ll_pwr.h>
@@ -7,7 +7,7 @@
 #include <stm32wlxx_ll_utils.h>
 #include "log.h"
 
-extern void initialise_monitor_handles(void);
+extern "C" void initialise_monitor_handles(void);
 
 static void setup_clock()
 {
@@ -27,6 +27,16 @@ static void setup_clock()
     LL_RCC_MSI_EnableRangeSelection();
     LL_RCC_MSI_SetRange(LL_RCC_MSIRANGE_11);
     LL_RCC_MSI_SetCalibTrimming(0);
+
+    LL_PWR_EnableBkUpAccess();
+    LL_RCC_LSE_SetDriveCapability(LL_RCC_LSEDRIVE_LOW);
+    LL_RCC_LSE_Enable();
+
+    /* Wait till LSE is ready */
+    while(LL_RCC_LSE_IsReady() != 1)
+    {
+    }
+
     LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_MSI);
 
     /* Wait till System clock is ready */
