@@ -5,6 +5,7 @@
 #include <stm32wlxx_ll_pwr.h>
 #include <stm32wlxx_ll_system.h>
 #include <stm32wlxx_ll_utils.h>
+#include "log.h"
 
 extern void initialise_monitor_handles(void);
 
@@ -49,6 +50,9 @@ int main()
     initialise_monitor_handles();
     setup_clock();
 
-    printf("Hello, World!\n");
+    WLB_LOG("Started\n");
+
+
+
     return 0;
 }
