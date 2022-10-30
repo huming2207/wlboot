@@ -6,6 +6,8 @@
 
 #include "lpuart.hpp"
 
+LfBb<uint8_t, 512> lpuart::tx_buf = {};
+LfBb<uint8_t, 512> lpuart::rx_buf = {};
 
 bool lpuart::init()
 {
@@ -53,9 +55,6 @@ bool lpuart::init()
     {
     }
 
-    LFBB_Init(&tx_fifo, tx_buf, sizeof(tx_buf));
-    LFBB_Init(&rx_fifo, rx_buf, sizeof(rx_buf));
-
     return true;
 }
 
@@ -65,34 +64,40 @@ bool lpuart::transmit(uint8_t *buf, size_t len)
         return false; // Too big for Tx FIFO
     }
 
-    auto *acq_buf= LFBB_WriteAcquire(&tx_fifo, len);
+    auto *acq_buf = tx_buf.WriteAcquire(len);
     if (acq_buf == nullptr) {
         return false;
     }
 
     memcpy(acq_buf, buf, len);
-    LFBB_WriteRelease(&tx_fifo, len);
+    tx_buf.WriteRelease(len);
     return true;
 }
 
-void lpuart::on_pkt_recv(uint8_t *buf, size_t len)
+uint8_t *lpuart::begin_read_rx_buf(size_t buf_len, size_t *avail_len)
 {
+    auto ret = rx_buf.ReadAcquire();
+    if (avail_len != nullptr) {
+        *avail_len = ret.second;
+    }
 
+    return ret.first;
 }
 
 void lpuart::handle_task()
 {
     if (rx_avail) {
-        auto *acq_buf = LFBB_WriteAcquire(&rx_fifo, 1);
+        rx_avail = false;
+        auto *acq_buf = rx_buf.WriteAcquire(1);
         *acq_buf = LL_LPUART_ReceiveData8(LPUART1);
-        LFBB_WriteRelease(&rx_fifo, 1);
+        rx_buf.WriteRelease(1);
     }
 
     if (tx_avail) {
-        size_t _avail_len = 0;
-        auto *data = LFBB_ReadAcquire(&tx_fifo, &_avail_len);
-        LL_LPUART_TransmitData8(LPUART1, *data);
-        LFBB_ReadRelease(&tx_fifo, 1);
+        tx_avail = false;
+        auto data = tx_buf.ReadAcquire();
+        LL_LPUART_TransmitData8(LPUART1, *data.first);
+        tx_buf.ReadRelease(1);
     }
 }
 
@@ -114,7 +119,31 @@ void lpuart::set_rx(bool enable)
     }
 }
 
-void LPUART1_IRQHandler()
+void lpuart::done_read_rx_buf(size_t len)
+{
+    rx_buf.ReadRelease(len);
+}
+
+size_t lpuart::get_rx_buf_len()
+{
+    auto ret = rx_buf.ReadAcquire();
+    rx_buf.ReadRelease(0);
+
+    return ret.second;
+}
+
+void lpuart::on_intr()
+{
+    if (LL_LPUART_IsActiveFlag_RXNE_RXFNE(LPUART1)) {
+        rx_avail = true;
+    }
+
+    if (LL_LPUART_IsActiveFlag_TXE_TXFNF(LPUART1)) {
+        tx_avail = true;
+    }
+}
+
+extern "C" void LPUART1_IRQHandler()
 {
     lpuart::instance()->on_intr();
 }

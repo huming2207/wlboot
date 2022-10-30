@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/external/stm32-cmake/cmake/stm32_gcc.cmake")
 set(STM32_CUBE_WL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/STM32CubeWL")
@@ -17,9 +17,10 @@ add_executable(
             "main/hal/uart.hpp"
             "main/hal/lpuart.cpp" "main/hal/lpuart.hpp"
             "main/interrupt/intr_handler.c" "main/interrupt/intr_handler.h"
+            external/lfbb/lfbb.hpp external/lfbb/lfbb_impl.hpp
 )
 
-target_include_directories(wlboot PUBLIC "external/logging" "external/logging/printf")
+target_include_directories(wlboot PUBLIC "external/logging" "external/logging/printf" "external/lfbb")
 target_link_libraries(wlboot PRIVATE
         HAL::STM32::WL::M4::LL_RCC
         HAL::STM32::WL::M4::LL_GPIO
@@ -33,20 +34,21 @@ target_link_libraries(wlboot PRIVATE
         STM32::Nano
 )
 
-add_subdirectory("external/lfbb")
-target_link_libraries(wlboot PRIVATE lfbb)
+#add_subdirectory("external/lfbb")
+#target_link_libraries(wlboot PRIVATE lfbb)
 
 # See: https://stackoverflow.com/a/72037241
 target_compile_options(wlboot PUBLIC
         -ffunction-sections -fdata-sections
         -fno-rtti -fno-asynchronous-unwind-tables -fno-omit-frame-pointer -fno-exceptions
+        -mthumb -mcpu=cortex-m4 -mfloat-abi=soft
 )
 
 target_compile_definitions(wlboot PUBLIC
         USE_FULL_LL_DRIVER=1
 )
 
-target_link_options(wlboot PUBLIC -lc -lrdimon --specs=rdimon.specs -Wl,--gc-sections)
+target_link_options(wlboot PUBLIC -lc -lrdimon --specs=rdimon.specs -Wl,--gc-sections -mthumb -march=armv7+nofp -mcpu=cortex-m4 -mfloat-abi=soft)
 stm32_add_linker_script(wlboot PRIVATE misc/WL54CC_M4.ld)
 
 stm32_print_size_of_target(wlboot)

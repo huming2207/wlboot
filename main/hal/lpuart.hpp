@@ -1,7 +1,7 @@
 #pragma once
 
-#include <lfbb.h>
 #include "uart.hpp"
+#include "lfbb.hpp"
 
 class lpuart : public uart
 {
@@ -18,9 +18,11 @@ public:
 public:
     bool init() override;
     bool transmit(uint8_t *buf, size_t len) override;
-    void on_pkt_recv(uint8_t *buf, size_t len) override;
+    uint8_t *begin_read_rx_buf(size_t buf_len, size_t *avail_len) override;
+    void done_read_rx_buf(size_t len) override;
     void set_tx(bool enable) override;
     void set_rx(bool enable) override;
+    size_t get_rx_buf_len() override;
     void handle_task() override; // In main loop
     void on_intr(); // In interrupt routine
 
@@ -30,9 +32,7 @@ private:
     volatile bool error = false;
 
 private:
-    LFBB_Inst_Type rx_fifo = {};
-    LFBB_Inst_Type tx_fifo = {};
-    static uint8_t rx_buf[512];
-    static uint8_t tx_buf[512];
+    static LfBb<uint8_t, 512> rx_buf;
+    static LfBb<uint8_t, 512> tx_buf;
     lpuart() = default;
 };
