@@ -4,3 +4,6 @@
 [submodule "external/STM32CubeWL"]
 	path = external/STM32CubeWL
 	url = https://github.com/STMicroelectronics/STM32CubeWL
+[submodule "external/lfbb"]
+	path = external/lfbb
+	url = https://github.com/DNedic/lfbb_cpp
