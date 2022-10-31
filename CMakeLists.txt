@@ -34,21 +34,59 @@ target_link_libraries(wlboot PRIVATE
         STM32::Nano
 )
 
-#add_subdirectory("external/lfbb")
-#target_link_libraries(wlboot PRIVATE lfbb)
+if (CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+    message("Build in Release+Log mode")
+    target_compile_options(wlboot PUBLIC
+            -ffunction-sections -fdata-sections -flto -Os
+            -fno-rtti -fno-asynchronous-unwind-tables -fno-omit-frame-pointer -fno-exceptions
+            -mthumb -mcpu=cortex-m4 -mfloat-abi=soft
+    )
 
-# See: https://stackoverflow.com/a/72037241
-target_compile_options(wlboot PUBLIC
-        -ffunction-sections -fdata-sections
-        -fno-rtti -fno-asynchronous-unwind-tables -fno-omit-frame-pointer -fno-exceptions
-        -mthumb -mcpu=cortex-m4 -mfloat-abi=soft
-)
+    target_link_options(wlboot PUBLIC
+            -lc -lrdimon --specs=rdimon.specs -flto -Os
+            -Wl,--gc-sections
+            -mthumb -march=armv7+nofp -mcpu=cortex-m4 -mfloat-abi=soft
+    )
 
-target_compile_definitions(wlboot PUBLIC
-        USE_FULL_LL_DRIVER=1
-)
+    target_compile_definitions(wlboot PUBLIC
+            USE_FULL_LL_DRIVER=1
+    )
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+    message("Build in Release with no log mode")
+    target_compile_options(wlboot PUBLIC
+            -ffunction-sections -fdata-sections -flto -Os
+            -fno-rtti -fno-asynchronous-unwind-tables -fno-omit-frame-pointer -fno-exceptions
+            -mthumb -mcpu=cortex-m4 -mfloat-abi=soft
+    )
 
-target_link_options(wlboot PUBLIC -lc -lrdimon --specs=rdimon.specs -Wl,--gc-sections -mthumb -march=armv7+nofp -mcpu=cortex-m4 -mfloat-abi=soft)
+    target_link_options(wlboot PUBLIC
+            -Wl,--gc-sections -flto -Os
+            -mthumb -march=armv7+nofp -mcpu=cortex-m4 -mfloat-abi=soft
+    )
+
+    target_compile_definitions(wlboot PUBLIC
+            USE_FULL_LL_DRIVER=1
+            DISABLE_LOG=1
+    )
+else()
+    message("Unknown state, debug mode")
+    target_compile_options(wlboot PUBLIC
+            -ffunction-sections -fdata-sections
+            -fno-rtti -fno-asynchronous-unwind-tables -fno-omit-frame-pointer -fno-exceptions
+            -mthumb -mcpu=cortex-m4 -mfloat-abi=soft
+    )
+
+    target_link_options(wlboot PUBLIC
+            -lc -lrdimon --specs=rdimon.specs
+            -Wl,--gc-sections
+            -mthumb -march=armv7+nofp -mcpu=cortex-m4 -mfloat-abi=soft
+    )
+
+    target_compile_definitions(wlboot PUBLIC
+            USE_FULL_LL_DRIVER=1
+    )
+endif()
+
 stm32_add_linker_script(wlboot PRIVATE misc/WL54CC_M4.ld)
 
 stm32_print_size_of_target(wlboot)

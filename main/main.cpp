@@ -7,7 +7,9 @@
 #include <stm32wlxx_ll_utils.h>
 #include "log.h"
 
+#ifndef DISABLE_LOG
 extern "C" void initialise_monitor_handles(void);
+#endif
 
 static void setup_clock()
 {
@@ -57,12 +59,12 @@ static void setup_clock()
 
 int main()
 {
+#ifndef DISABLE_LOG
     initialise_monitor_handles();
+#endif
+
     setup_clock();
-
     WLB_LOG("Started\n");
-
-
 
     return 0;
 }
