@@ -6,6 +6,7 @@
     } while(0)             \
 
 #else
+#include <stdio.h>
 
 #if defined(__cplusplus) && (__cplusplus >  201703L)
 #define WLB_LOG(text, ...) \

@@ -1,17 +1,12 @@
 #include <cstdio>
-#include <cstdint>
-#include <stm32wle5xx.h>
-#include <stm32wlxx_ll_rcc.h>
-#include <stm32wlxx_ll_pwr.h>
-#include <stm32wlxx_ll_system.h>
-#include <stm32wlxx_ll_utils.h>
-#include "log.h"
+#include "stm32wlxx_hal.h"
+#include "stm32wlxx_ll_utils.h"
 
-#ifndef DISABLE_LOG
+#include <lpuart.hpp>
+
 extern "C" void initialise_monitor_handles(void);
-#endif
 
-static void setup_clock()
+static void SystemClock_Config()
 {
     LL_FLASH_SetLatency(LL_FLASH_LATENCY_2);
     while(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_2)
@@ -29,9 +24,8 @@ static void setup_clock()
     LL_RCC_MSI_EnableRangeSelection();
     LL_RCC_MSI_SetRange(LL_RCC_MSIRANGE_11);
     LL_RCC_MSI_SetCalibTrimming(0);
-
     LL_PWR_EnableBkUpAccess();
-    LL_RCC_LSE_SetDriveCapability(LL_RCC_LSEDRIVE_LOW);
+    LL_RCC_LSE_SetDriveCapability(LL_RCC_LSEDRIVE_HIGH);
     LL_RCC_LSE_Enable();
 
     /* Wait till LSE is ready */
@@ -39,6 +33,8 @@ static void setup_clock()
     {
     }
 
+    LL_RCC_LSE_EnablePropagation(); // Enable LSE output to peripherals, like LPUART etc.
+    LL_RCC_MSI_EnablePLLMode();
     LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_MSI);
 
     /* Wait till System clock is ready */
@@ -50,21 +46,26 @@ static void setup_clock()
     LL_RCC_SetAHB3Prescaler(LL_RCC_SYSCLK_DIV_1);
     LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
     LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
-
-    LL_Init1msTick(48000000);
-
     /* Update CMSIS variable (which can be updated also through SystemCoreClockUpdate function) */
     LL_SetSystemCoreClock(48000000);
+    HAL_InitTick (TICK_INT_PRIORITY);
 }
 
 int main()
 {
-#ifndef DISABLE_LOG
     initialise_monitor_handles();
-#endif
+    HAL_Init();
+    SystemClock_Config();
 
-    setup_clock();
-    WLB_LOG("Started\n");
+    setvbuf(stdout, NULL, _IONBF, 0);
+    printf("wtf1\n");
 
-    return 0;
+    printf("wtf2\n");
+
+    lpuart::instance()->init();
+
+    while (true) {
+        lpuart::instance()->handle_task();
+    }
 }
+

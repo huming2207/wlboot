@@ -5,52 +5,51 @@
 #include <stm32wlxx_ll_bus.h>
 
 #include "lpuart.hpp"
+#include "log.h"
 
-LfBb<uint8_t, 512> lpuart::tx_buf = {};
-LfBb<uint8_t, 512> lpuart::rx_buf = {};
+LfBb<uint8_t, 1024> lpuart::rx_buf = {};
 
 bool lpuart::init()
 {
-    LL_LPUART_InitTypeDef lpuart_cfg = {0};
-    LL_GPIO_InitTypeDef gpio_cfg = {0};
+    LL_LPUART_InitTypeDef LPUART_InitStruct = {0};
+
+    LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
     LL_RCC_SetLPUARTClockSource(LL_RCC_LPUART1_CLKSOURCE_LSE);
 
-    /* Peripheral clock enable */
     LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_LPUART1);
     LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA);
 
-    /**
-     * LPUART1 GPIO Configuration
-        PA2   ------> LPUART1_TX
-        PA3   ------> LPUART1_RX
-    */
-    gpio_cfg.Pin = LL_GPIO_PIN_2 | LL_GPIO_PIN_3;
-    gpio_cfg.Mode = LL_GPIO_MODE_ALTERNATE;
-    gpio_cfg.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    gpio_cfg.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    gpio_cfg.Pull = LL_GPIO_PULL_NO;
-    gpio_cfg.Alternate = LL_GPIO_AF_8;
-    LL_GPIO_Init(GPIOA, &gpio_cfg);
+    GPIO_InitStruct.Pin = LL_GPIO_PIN_2|LL_GPIO_PIN_3;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_8;
+    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+    /* LPUART1 interrupt Init */
     NVIC_SetPriority(LPUART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
     NVIC_EnableIRQ(LPUART1_IRQn);
 
-    lpuart_cfg.PrescalerValue = LL_LPUART_PRESCALER_DIV1;
-    lpuart_cfg.BaudRate = 9600;
-    lpuart_cfg.DataWidth = LL_LPUART_DATAWIDTH_8B;
-    lpuart_cfg.StopBits = LL_LPUART_STOPBITS_1;
-    lpuart_cfg.Parity = LL_LPUART_PARITY_NONE;
-    lpuart_cfg.TransferDirection = LL_LPUART_DIRECTION_TX_RX;
-    lpuart_cfg.HardwareFlowControl = LL_LPUART_HWCONTROL_NONE;
-    LL_LPUART_Init(LPUART1, &lpuart_cfg);
+    /* USER CODE BEGIN LPUART1_Init 1 */
+
+    /* USER CODE END LPUART1_Init 1 */
+    LPUART_InitStruct.PrescalerValue = LL_LPUART_PRESCALER_DIV1;
+    LPUART_InitStruct.BaudRate = 9600;
+    LPUART_InitStruct.DataWidth = LL_LPUART_DATAWIDTH_8B;
+    LPUART_InitStruct.StopBits = LL_LPUART_STOPBITS_1;
+    LPUART_InitStruct.Parity = LL_LPUART_PARITY_NONE;
+    LPUART_InitStruct.TransferDirection = LL_LPUART_DIRECTION_TX_RX;
+    LPUART_InitStruct.HardwareFlowControl = LL_LPUART_HWCONTROL_NONE;
+    LL_LPUART_Init(LPUART1, &LPUART_InitStruct);
     LL_LPUART_SetTXFIFOThreshold(LPUART1, LL_LPUART_FIFOTHRESHOLD_1_8);
     LL_LPUART_SetRXFIFOThreshold(LPUART1, LL_LPUART_FIFOTHRESHOLD_1_8);
-    LL_LPUART_EnableIT_TXE(LPUART1);
     LL_LPUART_EnableIT_RXNE_RXFNE(LPUART1);
-    LL_LPUART_EnableInStopMode(LPUART1);
 
     LL_LPUART_Enable(LPUART1);
+
+    /* Polling LPUART1 initialisation */
     while((!(LL_LPUART_IsActiveFlag_TEACK(LPUART1))) || (!(LL_LPUART_IsActiveFlag_REACK(LPUART1))))
     {
     }
@@ -60,17 +59,19 @@ bool lpuart::init()
 
 bool lpuart::transmit(uint8_t *buf, size_t len)
 {
-    if (len > sizeof(tx_buf)) {
-        return false; // Too big for Tx FIFO
+    if (buf == nullptr) return false;
+
+    for (size_t idx = 0; idx < len; idx += 1) {
+        while (!LL_LPUART_IsActiveFlag_TXE_TXFNF(LPUART1)) {}
+
+        if (idx == len - 1) {
+            LL_LPUART_ClearFlag_TC(LPUART1);
+        }
+
+        LL_LPUART_TransmitData8(LPUART1, buf[idx]);
     }
 
-    auto *acq_buf = tx_buf.WriteAcquire(len);
-    if (acq_buf == nullptr) {
-        return false;
-    }
-
-    memcpy(acq_buf, buf, len);
-    tx_buf.WriteRelease(len);
+    while (!LL_LPUART_IsActiveFlag_TC(LPUART1)) {}
     return true;
 }
 
@@ -90,14 +91,8 @@ void lpuart::handle_task()
         rx_avail = false;
         auto *acq_buf = rx_buf.WriteAcquire(1);
         *acq_buf = LL_LPUART_ReceiveData8(LPUART1);
+        WLB_LOG("Got %c\n", *acq_buf);
         rx_buf.WriteRelease(1);
-    }
-
-    if (tx_avail) {
-        tx_avail = false;
-        auto data = tx_buf.ReadAcquire();
-        LL_LPUART_TransmitData8(LPUART1, *data.first);
-        tx_buf.ReadRelease(1);
     }
 }
 
@@ -134,12 +129,28 @@ size_t lpuart::get_rx_buf_len()
 
 void lpuart::on_intr()
 {
-    if (LL_LPUART_IsActiveFlag_RXNE_RXFNE(LPUART1)) {
-        rx_avail = true;
+    if (LL_LPUART_IsActiveFlag_FE(LPUART1)) {
+        LL_LPUART_ClearFlag_FE(LPUART1);
+        framing_error = true;
     }
 
-    if (LL_LPUART_IsActiveFlag_TXE_TXFNF(LPUART1)) {
-        tx_avail = true;
+    if (LL_LPUART_IsActiveFlag_NE(LPUART1)) {
+        noise_error = true;
+        LL_LPUART_ClearFlag_NE(LPUART1);
+    }
+
+    if (LL_LPUART_IsActiveFlag_ORE(LPUART1)) {
+        overrun_error = true;
+        LL_LPUART_ClearFlag_ORE(LPUART1);
+    }
+
+    if (LL_LPUART_IsActiveFlag_PE(LPUART1)) {
+        parity_error = true;
+        LL_LPUART_ClearFlag_PE(LPUART1);
+    }
+
+    if (LL_LPUART_IsActiveFlag_RXNE_RXFNE(LPUART1)) {
+        rx_avail = true;
     }
 }
 

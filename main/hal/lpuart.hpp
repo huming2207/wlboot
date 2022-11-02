@@ -28,11 +28,12 @@ public:
 
 private:
     volatile bool rx_avail = false;
-    volatile bool tx_avail = false;
-    volatile bool error = false;
+    volatile bool noise_error = false;
+    volatile bool parity_error = false;
+    volatile bool overrun_error = false;
+    volatile bool framing_error = false;
 
 private:
-    static LfBb<uint8_t, 512> rx_buf;
-    static LfBb<uint8_t, 512> tx_buf;
+    static LfBb<uint8_t, 1024> rx_buf;
     lpuart() = default;
 };
