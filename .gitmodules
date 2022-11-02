@@ -1,6 +1,0 @@
-[submodule "external/stm32-cmake"]
-	path = external/stm32-cmake
-	url = https://github.com/ObKo/stm32-cmake
-[submodule "external/STM32CubeWL"]
-	path = external/STM32CubeWL
-	url = https://github.com/STMicroelectronics/STM32CubeWL
