@@ -57,7 +57,6 @@ int main()
     HAL_Init();
     SystemClock_Config();
 
-    setvbuf(stdout, NULL, _IONBF, 0);
     printf("wtf1\n");
 
     printf("wtf2\n");
