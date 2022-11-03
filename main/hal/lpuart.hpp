@@ -24,14 +24,13 @@ public:
     void set_rx(bool enable) override;
     size_t get_rx_buf_len() override;
     void handle_task() override; // In main loop
-    void on_intr(); // In interrupt routine
 
-private:
-    volatile bool rx_avail = false;
-    volatile bool noise_error = false;
-    volatile bool parity_error = false;
-    volatile bool overrun_error = false;
-    volatile bool framing_error = false;
+public:
+    static volatile int32_t recv_byte;
+    static volatile bool framing_error;
+    static volatile bool noise_error;
+    static volatile bool overrun_error;
+    static volatile bool parity_error;
 
 private:
     static LfBb<uint8_t, 1024> rx_buf;

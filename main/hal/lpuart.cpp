@@ -9,6 +9,12 @@
 
 LfBb<uint8_t, 1024> lpuart::rx_buf = {};
 
+volatile int32_t lpuart::recv_byte = -1;
+volatile bool lpuart::framing_error = false;
+volatile bool lpuart::noise_error = false;
+volatile bool lpuart::overrun_error = false;
+volatile bool lpuart::parity_error = false;
+
 bool lpuart::init()
 {
     LL_LPUART_InitTypeDef LPUART_InitStruct = {0};
@@ -45,7 +51,7 @@ bool lpuart::init()
     LL_LPUART_Init(LPUART1, &LPUART_InitStruct);
     LL_LPUART_SetTXFIFOThreshold(LPUART1, LL_LPUART_FIFOTHRESHOLD_1_8);
     LL_LPUART_SetRXFIFOThreshold(LPUART1, LL_LPUART_FIFOTHRESHOLD_1_8);
-    LL_LPUART_EnableIT_RXNE_RXFNE(LPUART1);
+    LL_LPUART_DisableFIFO(LPUART1);
 
     LL_LPUART_Enable(LPUART1);
 
@@ -54,6 +60,9 @@ bool lpuart::init()
     {
     }
 
+    LL_LPUART_ClearFlag_ORE(LPUART1);
+    LL_LPUART_EnableIT_RXNE_RXFNE(LPUART1);
+    LL_LPUART_EnableIT_ERROR(LPUART1);
     return true;
 }
 
@@ -87,11 +96,11 @@ uint8_t *lpuart::begin_read_rx_buf(size_t buf_len, size_t *avail_len)
 
 void lpuart::handle_task()
 {
-    if (rx_avail) {
-        rx_avail = false;
+    if (recv_byte != -1) {
+        volatile uint8_t byte_recved = recv_byte & 0xff;
+        recv_byte = -1;
         auto *acq_buf = rx_buf.WriteAcquire(1);
-        *acq_buf = LL_LPUART_ReceiveData8(LPUART1);
-        WLB_LOG("Got %c\n", *acq_buf);
+        *acq_buf = byte_recved;
         rx_buf.WriteRelease(1);
     }
 }
@@ -127,34 +136,29 @@ size_t lpuart::get_rx_buf_len()
     return ret.second;
 }
 
-void lpuart::on_intr()
+extern "C" void LPUART1_IRQHandler()
 {
+    if (LL_LPUART_IsActiveFlag_RXNE_RXFNE(LPUART1)) {
+        lpuart::recv_byte = LL_LPUART_ReceiveData8(LPUART1);
+    }
+
     if (LL_LPUART_IsActiveFlag_FE(LPUART1)) {
         LL_LPUART_ClearFlag_FE(LPUART1);
-        framing_error = true;
+        lpuart::framing_error = true;
     }
 
     if (LL_LPUART_IsActiveFlag_NE(LPUART1)) {
-        noise_error = true;
         LL_LPUART_ClearFlag_NE(LPUART1);
+        lpuart::noise_error = true;
     }
 
     if (LL_LPUART_IsActiveFlag_ORE(LPUART1)) {
-        overrun_error = true;
         LL_LPUART_ClearFlag_ORE(LPUART1);
+        lpuart::overrun_error = true;
     }
 
     if (LL_LPUART_IsActiveFlag_PE(LPUART1)) {
-        parity_error = true;
         LL_LPUART_ClearFlag_PE(LPUART1);
+        lpuart::parity_error = true;
     }
-
-    if (LL_LPUART_IsActiveFlag_RXNE_RXFNE(LPUART1)) {
-        rx_avail = true;
-    }
-}
-
-extern "C" void LPUART1_IRQHandler()
-{
-    lpuart::instance()->on_intr();
 }
