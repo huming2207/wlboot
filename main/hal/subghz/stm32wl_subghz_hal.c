@@ -1,6 +1,7 @@
-#include "stm32wl_subghz_hal.h"
-#include "stm32wlxx_ll_utils.h"
+#include <stm32wlxx_ll_utils.h>
 #include <stm32wlxx_ll_pwr.h>
+
+#include "stm32wl_subghz_hal.h"
 
 // Some weird loop cycles definition from ST
 #define SUBGHZ_DEFAULT_LOOP_TIME   ((SystemCoreClock*28U)>>19U)
@@ -8,6 +9,15 @@
 #define SUBGHZ_NSS_LOOP_TIME       ((SystemCoreClock*24U)>>16U)
 #define SUBGHZ_DEFAULT_TIMEOUT     100U // 100ms
 #define SUBGHZ_DUMMY_DATA          0xFFU
+
+#define SUBGHZSPI_BAUDRATEPRESCALER_2       (0x00000000U)
+#define SUBGHZSPI_BAUDRATEPRESCALER_4       (SPI_CR1_BR_0)
+#define SUBGHZSPI_BAUDRATEPRESCALER_8       (SPI_CR1_BR_1)
+#define SUBGHZSPI_BAUDRATEPRESCALER_16      (SPI_CR1_BR_1 | SPI_CR1_BR_0)
+#define SUBGHZSPI_BAUDRATEPRESCALER_32      (SPI_CR1_BR_2)
+#define SUBGHZSPI_BAUDRATEPRESCALER_64      (SPI_CR1_BR_2 | SPI_CR1_BR_0)
+#define SUBGHZSPI_BAUDRATEPRESCALER_128     (SPI_CR1_BR_2 | SPI_CR1_BR_1)
+#define SUBGHZSPI_BAUDRATEPRESCALER_256     (SPI_CR1_BR_2 | SPI_CR1_BR_1 | SPI_CR1_BR_0)
 
 static bool subghz_spi_send_byte(uint8_t data)
 {
@@ -247,4 +257,76 @@ sx126x_hal_status_t sx126x_hal_wakeup(const void *context)
 
     LL_PWR_UnselectSUBGHZSPI_NSS();
     return SX126X_HAL_STATUS_OK;
+}
+
+bool stm32wl_subghz_init()
+{
+    LL_APB3_GRP1_EnableClock(LL_APB3_GRP1_PERIPH_SUBGHZSPI);
+    NVIC_SetPriority(SUBGHZ_Radio_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
+    NVIC_EnableIRQ(SUBGHZ_Radio_IRQn);
+
+    sx126x_hal_reset(NULL);
+
+    /* Asserts the reset signal of the Radio peripheral */
+    LL_PWR_UnselectSUBGHZSPI_NSS();
+
+    /* Enable EXTI 44 : Radio IRQ ITs for CPU1 */
+    LL_EXTI_EnableIT_32_63(LL_EXTI_LINE_44);
+
+    /* Enable wakeup signal of the Radio peripheral */
+    LL_PWR_SetRadioBusyTrigger(LL_PWR_RADIO_BUSY_TRIGGER_WU_IT);
+
+    /* Clear Pending Flag */
+    LL_PWR_ClearFlag_RFBUSY();
+
+    // Initialise SPI
+    /* Disable SUBGHZSPI Peripheral */
+    CLEAR_BIT(SUBGHZSPI->CR1, SPI_CR1_SPE);
+
+    /*----------------------- SPI CR1 Configuration ----------------------------*
+     *             SPI Mode: Master                                             *
+     *   Communication Mode: 2 lines (Full-Duplex)                              *
+     *       Clock polarity: Low                                                *
+     *                phase: 1st Edge                                           *
+     *       NSS management: Internal (Done with External bit inside PWR        *
+     *  Communication speed: BaudratePrescaler                             *
+     *            First bit: MSB                                                *
+     *      CRC calculation: Disable                                            *
+     *--------------------------------------------------------------------------*/
+    WRITE_REG(SUBGHZSPI->CR1, (SPI_CR1_MSTR | SPI_CR1_SSI | SUBGHZSPI_BAUDRATEPRESCALER_2 | SPI_CR1_SSM));
+
+    /*----------------------- SPI CR2 Configuration ----------------------------*
+     *            Data Size: 8bits                                              *
+     *              TI Mode: Disable                                            *
+     *            NSS Pulse: Disable                                            *
+     *    Rx FIFO Threshold: 8bits                                              *
+     *--------------------------------------------------------------------------*/
+    WRITE_REG(SUBGHZSPI->CR2, (SPI_CR2_FRXTH |  SPI_CR2_DS_0 | SPI_CR2_DS_1 | SPI_CR2_DS_2));
+
+    /* Enable SUBGHZSPI Peripheral */
+    SET_BIT(SUBGHZSPI->CR1, SPI_CR1_SPE);
+    return true;
+}
+
+bool stm32wl_subghz_deinit()
+{
+    /* Disable SUBGHZSPI Peripheral */
+    CLEAR_BIT(SUBGHZSPI->CR1, SPI_CR1_SPE);
+
+    LL_APB3_GRP1_DisableClock(LL_APB3_GRP1_PERIPH_SUBGHZSPI);
+    NVIC_DisableIRQ(SUBGHZ_Radio_IRQn);
+
+    /* Disable EXTI 44 : Radio IRQ ITs for CPU1 */
+    LL_EXTI_DisableIT_32_63(LL_EXTI_LINE_44);
+
+    /* Disable wakeup signal of the Radio peripheral */
+    LL_PWR_SetRadioBusyTrigger(LL_PWR_RADIO_BUSY_TRIGGER_NONE);
+
+    /* Clear Pending Flag */
+    LL_PWR_ClearFlag_RFBUSY();
+
+    /* Re-asserts the reset signal of the Radio peripheral */
+    LL_RCC_RF_EnableReset();
+
+    return true;
 }
