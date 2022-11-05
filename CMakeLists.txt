@@ -13,18 +13,24 @@ file(GLOB_RECURSE STM32_HAL_SRC
         "external/driver/Inc/*.h"
 )
 
+file(GLOB_RECURSE SX126X_HAL_SRC
+        "main/hal/subghz/*.c"
+        "main/hal/subghz/*.h"
+)
+
 project(wlboot C CXX ASM)
 
 add_executable(
         wlboot
             "main/stm32wlxx_hal_conf.h" "main/stm32wlxx_it.c" "main/stm32wlxx_it.h"
             "main/startup_stm32wle5xx.s" "main/system_stm32wlxx.c"
-            ${STM32_HAL_SRC}
+            ${STM32_HAL_SRC} ${SX126X_HAL_SRC}
             "main/main.cpp"
             "external/logging/log.c" "external/logging/log.h"
             "main/hal/uart.hpp"
             "main/hal/lpuart.cpp" "main/hal/lpuart.hpp"
-            external/lfbb/lfbb.hpp external/lfbb/lfbb_impl.hpp
+            "main/hal/subghz.cpp" "main/hal/subghz.hpp"
+            "external/lfbb/lfbb.hpp" "external/lfbb/lfbb_impl.hpp"
         )
 
 target_include_directories(wlboot PUBLIC
