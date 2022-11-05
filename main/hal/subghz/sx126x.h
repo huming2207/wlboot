@@ -151,8 +151,8 @@ typedef enum sx126x_status_e
  */
 typedef enum sx126x_sleep_cfgs_e
 {
-    SX126X_SLEEP_CFG_COLD_START = ( 0 << 2 ),
-    SX126X_SLEEP_CFG_WARM_START = ( 1 << 2 ),
+    SX126X_SLEEP_CFG_COLD_START = (0 << 2),
+    SX126X_SLEEP_CFG_WARM_START = (1 << 2),
 } sx126x_sleep_cfgs_t;
 
 /**
@@ -160,7 +160,7 @@ typedef enum sx126x_sleep_cfgs_e
  */
 typedef enum sx126x_standby_cfgs_e
 {
-    SX126X_STANDBY_CFG_RC   = 0x00,
+    SX126X_STANDBY_CFG_RC = 0x00,
     SX126X_STANDBY_CFG_XOSC = 0x01,
 } sx126x_standby_cfgs_t;
 
@@ -171,7 +171,7 @@ typedef uint8_t sx126x_standby_cfg_t;
  */
 typedef enum sx126x_reg_mods_e
 {
-    SX126X_REG_MODE_LDO  = 0x00,  // default
+    SX126X_REG_MODE_LDO = 0x00,  // default
     SX126X_REG_MODE_DCDC = 0x01,
 } sx126x_reg_mod_t;
 
@@ -191,9 +191,9 @@ typedef struct sx126x_pa_cfg_params_s
  */
 typedef enum sx126x_fallback_modes_e
 {
-    SX126X_FALLBACK_STDBY_RC   = 0x20,
+    SX126X_FALLBACK_STDBY_RC = 0x20,
     SX126X_FALLBACK_STDBY_XOSC = 0x30,
-    SX126X_FALLBACK_FS         = 0x40,
+    SX126X_FALLBACK_FS = 0x40,
 } sx126x_fallback_modes_t;
 
 /**
@@ -201,22 +201,22 @@ typedef enum sx126x_fallback_modes_e
  */
 enum sx126x_irq_masks_e
 {
-    SX126X_IRQ_NONE              = ( 0 << 0 ),
-    SX126X_IRQ_TX_DONE           = ( 1 << 0 ),
-    SX126X_IRQ_RX_DONE           = ( 1 << 1 ),
-    SX126X_IRQ_PREAMBLE_DETECTED = ( 1 << 2 ),
-    SX126X_IRQ_SYNC_WORD_VALID   = ( 1 << 3 ),
-    SX126X_IRQ_HEADER_VALID      = ( 1 << 4 ),
-    SX126X_IRQ_HEADER_ERROR      = ( 1 << 5 ),
-    SX126X_IRQ_CRC_ERROR         = ( 1 << 6 ),
-    SX126X_IRQ_CAD_DONE          = ( 1 << 7 ),
-    SX126X_IRQ_CAD_DETECTED      = ( 1 << 8 ),
-    SX126X_IRQ_TIMEOUT           = ( 1 << 9 ),
-    SX126X_IRQ_LR_FHSS_HOP       = ( 1 << 14 ),
-    SX126X_IRQ_ALL               = SX126X_IRQ_TX_DONE | SX126X_IRQ_RX_DONE | SX126X_IRQ_PREAMBLE_DETECTED |
-                                   SX126X_IRQ_SYNC_WORD_VALID | SX126X_IRQ_HEADER_VALID | SX126X_IRQ_HEADER_ERROR |
-                                   SX126X_IRQ_CRC_ERROR | SX126X_IRQ_CAD_DONE | SX126X_IRQ_CAD_DETECTED | SX126X_IRQ_TIMEOUT |
-                                   SX126X_IRQ_LR_FHSS_HOP,
+    SX126X_IRQ_NONE = (0 << 0),
+    SX126X_IRQ_TX_DONE = (1 << 0),
+    SX126X_IRQ_RX_DONE = (1 << 1),
+    SX126X_IRQ_PREAMBLE_DETECTED = (1 << 2),
+    SX126X_IRQ_SYNC_WORD_VALID = (1 << 3),
+    SX126X_IRQ_HEADER_VALID = (1 << 4),
+    SX126X_IRQ_HEADER_ERROR = (1 << 5),
+    SX126X_IRQ_CRC_ERROR = (1 << 6),
+    SX126X_IRQ_CAD_DONE = (1 << 7),
+    SX126X_IRQ_CAD_DETECTED = (1 << 8),
+    SX126X_IRQ_TIMEOUT = (1 << 9),
+    SX126X_IRQ_LR_FHSS_HOP = (1 << 14),
+    SX126X_IRQ_ALL = SX126X_IRQ_TX_DONE | SX126X_IRQ_RX_DONE | SX126X_IRQ_PREAMBLE_DETECTED |
+                     SX126X_IRQ_SYNC_WORD_VALID | SX126X_IRQ_HEADER_VALID | SX126X_IRQ_HEADER_ERROR |
+                     SX126X_IRQ_CRC_ERROR | SX126X_IRQ_CAD_DONE | SX126X_IRQ_CAD_DETECTED | SX126X_IRQ_TIMEOUT |
+                     SX126X_IRQ_LR_FHSS_HOP,
 };
 
 typedef uint16_t sx126x_irq_mask_t;
@@ -226,15 +226,15 @@ typedef uint16_t sx126x_irq_mask_t;
  */
 enum sx126x_cal_mask_e
 {
-    SX126X_CAL_RC64K      = ( 1 << 0 ),
-    SX126X_CAL_RC13M      = ( 1 << 1 ),
-    SX126X_CAL_PLL        = ( 1 << 2 ),
-    SX126X_CAL_ADC_PULSE  = ( 1 << 3 ),
-    SX126X_CAL_ADC_BULK_N = ( 1 << 4 ),
-    SX126X_CAL_ADC_BULK_P = ( 1 << 5 ),
-    SX126X_CAL_IMAGE      = ( 1 << 6 ),
-    SX126X_CAL_ALL        = SX126X_CAL_RC64K | SX126X_CAL_RC13M | SX126X_CAL_PLL | SX126X_CAL_ADC_PULSE |
-                            SX126X_CAL_ADC_BULK_N | SX126X_CAL_ADC_BULK_P | SX126X_CAL_IMAGE,
+    SX126X_CAL_RC64K = (1 << 0),
+    SX126X_CAL_RC13M = (1 << 1),
+    SX126X_CAL_PLL = (1 << 2),
+    SX126X_CAL_ADC_PULSE = (1 << 3),
+    SX126X_CAL_ADC_BULK_N = (1 << 4),
+    SX126X_CAL_ADC_BULK_P = (1 << 5),
+    SX126X_CAL_IMAGE = (1 << 6),
+    SX126X_CAL_ALL = SX126X_CAL_RC64K | SX126X_CAL_RC13M | SX126X_CAL_PLL | SX126X_CAL_ADC_PULSE |
+                     SX126X_CAL_ADC_BULK_N | SX126X_CAL_ADC_BULK_P | SX126X_CAL_IMAGE,
 };
 
 typedef uint8_t sx126x_cal_mask_t;
@@ -259,8 +259,8 @@ typedef enum sx126x_tcxo_ctrl_voltages_e
  */
 typedef enum sx126x_pkt_types_e
 {
-    SX126X_PKT_TYPE_GFSK    = 0x00,
-    SX126X_PKT_TYPE_LORA    = 0x01,
+    SX126X_PKT_TYPE_GFSK = 0x00,
+    SX126X_PKT_TYPE_LORA = 0x01,
     SX126X_PKT_TYPE_LR_FHSS = 0x03,
 } sx126x_pkt_type_t;
 
@@ -269,12 +269,12 @@ typedef enum sx126x_pkt_types_e
  */
 typedef enum sx126x_ramp_time_e
 {
-    SX126X_RAMP_10_US   = 0x00,
-    SX126X_RAMP_20_US   = 0x01,
-    SX126X_RAMP_40_US   = 0x02,
-    SX126X_RAMP_80_US   = 0x03,
-    SX126X_RAMP_200_US  = 0x04,
-    SX126X_RAMP_800_US  = 0x05,
+    SX126X_RAMP_10_US = 0x00,
+    SX126X_RAMP_20_US = 0x01,
+    SX126X_RAMP_40_US = 0x02,
+    SX126X_RAMP_80_US = 0x03,
+    SX126X_RAMP_200_US = 0x04,
+    SX126X_RAMP_800_US = 0x05,
     SX126X_RAMP_1700_US = 0x06,
     SX126X_RAMP_3400_US = 0x07,
 } sx126x_ramp_time_t;
@@ -284,11 +284,11 @@ typedef enum sx126x_ramp_time_e
  */
 typedef enum sx126x_gfsk_pulse_shape_e
 {
-    SX126X_GFSK_PULSE_SHAPE_OFF   = 0x00,
+    SX126X_GFSK_PULSE_SHAPE_OFF = 0x00,
     SX126X_GFSK_PULSE_SHAPE_BT_03 = 0x08,
     SX126X_GFSK_PULSE_SHAPE_BT_05 = 0x09,
     SX126X_GFSK_PULSE_SHAPE_BT_07 = 0x0A,
-    SX126X_GFSK_PULSE_SHAPE_BT_1  = 0x0B,
+    SX126X_GFSK_PULSE_SHAPE_BT_1 = 0x0B,
 } sx126x_gfsk_pulse_shape_t;
 
 /**
@@ -296,20 +296,20 @@ typedef enum sx126x_gfsk_pulse_shape_e
  */
 typedef enum sx126x_gfsk_bw_e
 {
-    SX126X_GFSK_BW_4800   = 0x1F,
-    SX126X_GFSK_BW_5800   = 0x17,
-    SX126X_GFSK_BW_7300   = 0x0F,
-    SX126X_GFSK_BW_9700   = 0x1E,
-    SX126X_GFSK_BW_11700  = 0x16,
-    SX126X_GFSK_BW_14600  = 0x0E,
-    SX126X_GFSK_BW_19500  = 0x1D,
-    SX126X_GFSK_BW_23400  = 0x15,
-    SX126X_GFSK_BW_29300  = 0x0D,
-    SX126X_GFSK_BW_39000  = 0x1C,
-    SX126X_GFSK_BW_46900  = 0x14,
-    SX126X_GFSK_BW_58600  = 0x0C,
-    SX126X_GFSK_BW_78200  = 0x1B,
-    SX126X_GFSK_BW_93800  = 0x13,
+    SX126X_GFSK_BW_4800 = 0x1F,
+    SX126X_GFSK_BW_5800 = 0x17,
+    SX126X_GFSK_BW_7300 = 0x0F,
+    SX126X_GFSK_BW_9700 = 0x1E,
+    SX126X_GFSK_BW_11700 = 0x16,
+    SX126X_GFSK_BW_14600 = 0x0E,
+    SX126X_GFSK_BW_19500 = 0x1D,
+    SX126X_GFSK_BW_23400 = 0x15,
+    SX126X_GFSK_BW_29300 = 0x0D,
+    SX126X_GFSK_BW_39000 = 0x1C,
+    SX126X_GFSK_BW_46900 = 0x14,
+    SX126X_GFSK_BW_58600 = 0x0C,
+    SX126X_GFSK_BW_78200 = 0x1B,
+    SX126X_GFSK_BW_93800 = 0x13,
     SX126X_GFSK_BW_117300 = 0x0B,
     SX126X_GFSK_BW_156200 = 0x1A,
     SX126X_GFSK_BW_187200 = 0x12,
@@ -324,10 +324,10 @@ typedef enum sx126x_gfsk_bw_e
  */
 typedef struct sx126x_mod_params_gfsk_s
 {
-    uint32_t                  br_in_bps;
-    uint32_t                  fdev_in_hz;
+    uint32_t br_in_bps;
+    uint32_t fdev_in_hz;
     sx126x_gfsk_pulse_shape_t pulse_shape;
-    sx126x_gfsk_bw_t          bw_dsb_param;
+    sx126x_gfsk_bw_t bw_dsb_param;
 } sx126x_mod_params_gfsk_t;
 
 /**
@@ -335,11 +335,11 @@ typedef struct sx126x_mod_params_gfsk_s
  */
 typedef enum sx126x_lora_sf_e
 {
-    SX126X_LORA_SF5  = 0x05,
-    SX126X_LORA_SF6  = 0x06,
-    SX126X_LORA_SF7  = 0x07,
-    SX126X_LORA_SF8  = 0x08,
-    SX126X_LORA_SF9  = 0x09,
+    SX126X_LORA_SF5 = 0x05,
+    SX126X_LORA_SF6 = 0x06,
+    SX126X_LORA_SF7 = 0x07,
+    SX126X_LORA_SF8 = 0x08,
+    SX126X_LORA_SF9 = 0x09,
     SX126X_LORA_SF10 = 0x0A,
     SX126X_LORA_SF11 = 0x0B,
     SX126X_LORA_SF12 = 0x0C,
@@ -381,7 +381,7 @@ typedef struct sx126x_mod_params_lora_s
     sx126x_lora_sf_t sf;    //!< LoRa Spreading Factor
     sx126x_lora_bw_t bw;    //!< LoRa Bandwidth
     sx126x_lora_cr_t cr;    //!< LoRa Coding Rate
-    uint8_t          ldro;  //!< Low DataRate Optimization configuration
+    uint8_t ldro;  //!< Low DataRate Optimization configuration
 } sx126x_mod_params_lora_t;
 
 /**
@@ -389,8 +389,8 @@ typedef struct sx126x_mod_params_lora_s
  */
 typedef enum sx126x_gfsk_preamble_detector_e
 {
-    SX126X_GFSK_PREAMBLE_DETECTOR_OFF        = 0x00,
-    SX126X_GFSK_PREAMBLE_DETECTOR_MIN_8BITS  = 0x04,
+    SX126X_GFSK_PREAMBLE_DETECTOR_OFF = 0x00,
+    SX126X_GFSK_PREAMBLE_DETECTOR_MIN_8BITS = 0x04,
     SX126X_GFSK_PREAMBLE_DETECTOR_MIN_16BITS = 0x05,
     SX126X_GFSK_PREAMBLE_DETECTOR_MIN_24BITS = 0x06,
     SX126X_GFSK_PREAMBLE_DETECTOR_MIN_32BITS = 0x07,
@@ -401,8 +401,8 @@ typedef enum sx126x_gfsk_preamble_detector_e
  */
 typedef enum sx126x_gfsk_address_filtering_e
 {
-    SX126X_GFSK_ADDRESS_FILTERING_DISABLE                      = 0x00,
-    SX126X_GFSK_ADDRESS_FILTERING_NODE_ADDRESS                 = 0x01,
+    SX126X_GFSK_ADDRESS_FILTERING_DISABLE = 0x00,
+    SX126X_GFSK_ADDRESS_FILTERING_NODE_ADDRESS = 0x01,
     SX126X_GFSK_ADDRESS_FILTERING_NODE_AND_BROADCAST_ADDRESSES = 0x02,
 } sx126x_gfsk_address_filtering_t;
 
@@ -420,10 +420,10 @@ typedef enum sx126x_gfsk_pkt_len_modes_e
  */
 typedef enum sx126x_gfsk_crc_types_e
 {
-    SX126X_GFSK_CRC_OFF         = 0x01,
-    SX126X_GFSK_CRC_1_BYTE      = 0x00,
-    SX126X_GFSK_CRC_2_BYTES     = 0x02,
-    SX126X_GFSK_CRC_1_BYTE_INV  = 0x04,
+    SX126X_GFSK_CRC_OFF = 0x01,
+    SX126X_GFSK_CRC_1_BYTE = 0x00,
+    SX126X_GFSK_CRC_2_BYTES = 0x02,
+    SX126X_GFSK_CRC_1_BYTE_INV = 0x04,
     SX126X_GFSK_CRC_2_BYTES_INV = 0x06,
 } sx126x_gfsk_crc_types_t;
 
@@ -432,7 +432,7 @@ typedef enum sx126x_gfsk_crc_types_e
  */
 typedef enum sx126x_gfsk_dc_free_e
 {
-    SX126X_GFSK_DC_FREE_OFF       = 0x00,
+    SX126X_GFSK_DC_FREE_OFF = 0x00,
     SX126X_GFSK_DC_FREE_WHITENING = 0x01,
 } sx126x_gfsk_dc_free_t;
 
@@ -450,11 +450,11 @@ typedef enum sx126x_lora_pkt_len_modes_e
  */
 typedef struct sx126x_pkt_params_lora_s
 {
-    uint16_t                    preamble_len_in_symb;  //!< Preamble length in symbols
+    uint16_t preamble_len_in_symb;  //!< Preamble length in symbols
     sx126x_lora_pkt_len_modes_t header_type;           //!< Header type
-    uint8_t                     pld_len_in_bytes;      //!< Payload length in bytes
-    bool                        crc_is_on;             //!< CRC activation
-    bool                        invert_iq_is_on;       //!< IQ polarity setup
+    uint8_t pld_len_in_bytes;      //!< Payload length in bytes
+    bool crc_is_on;             //!< CRC activation
+    bool invert_iq_is_on;       //!< IQ polarity setup
 } sx126x_pkt_params_lora_t;
 
 /**
@@ -462,14 +462,14 @@ typedef struct sx126x_pkt_params_lora_s
  */
 typedef struct sx126x_pkt_params_gfsk_s
 {
-    uint16_t                        preamble_len_in_bits;   //!< Preamble length in bits
+    uint16_t preamble_len_in_bits;   //!< Preamble length in bits
     sx126x_gfsk_preamble_detector_t preamble_detector;      //!< Preamble detection length
-    uint8_t                         sync_word_len_in_bits;  //!< Sync word length in bits
+    uint8_t sync_word_len_in_bits;  //!< Sync word length in bits
     sx126x_gfsk_address_filtering_t address_filtering;      //!< Address filtering configuration
-    sx126x_gfsk_pkt_len_modes_t     header_type;            //!< Header type
-    uint8_t                         pld_len_in_bytes;       //!< Payload length in bytes
-    sx126x_gfsk_crc_types_t         crc_type;               //!< CRC type configuration
-    sx126x_gfsk_dc_free_t           dc_free;                //!< Whitening configuration
+    sx126x_gfsk_pkt_len_modes_t header_type;            //!< Header type
+    uint8_t pld_len_in_bytes;       //!< Payload length in bytes
+    sx126x_gfsk_crc_types_t crc_type;               //!< CRC type configuration
+    sx126x_gfsk_dc_free_t dc_free;                //!< Whitening configuration
 } sx126x_pkt_params_gfsk_t;
 
 /**
@@ -494,8 +494,8 @@ typedef enum sx126x_cad_symbs_e
 typedef enum sx126x_cad_exit_modes_e
 {
     SX126X_CAD_ONLY = 0x00,
-    SX126X_CAD_RX   = 0x01,
-    SX126X_CAD_LBT  = 0x10,
+    SX126X_CAD_RX = 0x01,
+    SX126X_CAD_LBT = 0x10,
 } sx126x_cad_exit_modes_t;
 
 /**
@@ -503,11 +503,11 @@ typedef enum sx126x_cad_exit_modes_e
  */
 typedef struct sx126x_cad_param_s
 {
-    sx126x_cad_symbs_t      cad_symb_nb;      //!< CAD number of symbols
-    uint8_t                 cad_detect_peak;  //!< CAD peak detection
-    uint8_t                 cad_detect_min;   //!< CAD minimum detection
+    sx126x_cad_symbs_t cad_symb_nb;      //!< CAD number of symbols
+    uint8_t cad_detect_peak;  //!< CAD peak detection
+    uint8_t cad_detect_min;   //!< CAD minimum detection
     sx126x_cad_exit_modes_t cad_exit_mode;    //!< CAD exit mode
-    uint32_t                cad_timeout;      //!< CAD timeout value
+    uint32_t cad_timeout;      //!< CAD timeout value
 } sx126x_cad_params_t;
 
 /**
@@ -515,13 +515,13 @@ typedef struct sx126x_cad_param_s
  */
 typedef enum sx126x_chip_modes_e
 {
-    SX126X_CHIP_MODE_UNUSED    = 0,
-    SX126X_CHIP_MODE_RFU       = 1,
-    SX126X_CHIP_MODE_STBY_RC   = 2,
+    SX126X_CHIP_MODE_UNUSED = 0,
+    SX126X_CHIP_MODE_RFU = 1,
+    SX126X_CHIP_MODE_STBY_RC = 2,
     SX126X_CHIP_MODE_STBY_XOSC = 3,
-    SX126X_CHIP_MODE_FS        = 4,
-    SX126X_CHIP_MODE_RX        = 5,
-    SX126X_CHIP_MODE_TX        = 6,
+    SX126X_CHIP_MODE_FS = 4,
+    SX126X_CHIP_MODE_RX = 5,
+    SX126X_CHIP_MODE_TX = 6,
 } sx126x_chip_modes_t;
 
 /**
@@ -529,13 +529,13 @@ typedef enum sx126x_chip_modes_e
  */
 typedef enum sx126x_cmd_status_e
 {
-    SX126X_CMD_STATUS_RESERVED          = 0,
-    SX126X_CMD_STATUS_RFU               = 1,
-    SX126X_CMD_STATUS_DATA_AVAILABLE    = 2,
-    SX126X_CMD_STATUS_CMD_TIMEOUT       = 3,
+    SX126X_CMD_STATUS_RESERVED = 0,
+    SX126X_CMD_STATUS_RFU = 1,
+    SX126X_CMD_STATUS_DATA_AVAILABLE = 2,
+    SX126X_CMD_STATUS_CMD_TIMEOUT = 3,
     SX126X_CMD_STATUS_CMD_PROCESS_ERROR = 4,
-    SX126X_CMD_STATUS_CMD_EXEC_FAILURE  = 5,
-    SX126X_CMD_STATUS_CMD_TX_DONE       = 6,
+    SX126X_CMD_STATUS_CMD_EXEC_FAILURE = 5,
+    SX126X_CMD_STATUS_CMD_TX_DONE = 6,
 } sx126x_cmd_status_t;
 
 /**
@@ -572,8 +572,8 @@ typedef struct sx126x_rx_status_gfsk_s
 typedef struct sx126x_pkt_status_gfsk_s
 {
     sx126x_rx_status_gfsk_t rx_status;
-    int8_t                  rssi_sync;  //!< The RSSI measured on last packet
-    int8_t                  rssi_avg;   //!< The averaged RSSI
+    int8_t rssi_sync;  //!< The RSSI measured on last packet
+    int8_t rssi_avg;   //!< The averaged RSSI
 } sx126x_pkt_status_gfsk_t;
 
 /**
@@ -611,14 +611,14 @@ typedef struct sx126x_stats_lora_s
  */
 enum sx126x_errors_e
 {
-    SX126X_ERRORS_RC64K_CALIBRATION = ( 1 << 0 ),
-    SX126X_ERRORS_RC13M_CALIBRATION = ( 1 << 1 ),
-    SX126X_ERRORS_PLL_CALIBRATION   = ( 1 << 2 ),
-    SX126X_ERRORS_ADC_CALIBRATION   = ( 1 << 3 ),
-    SX126X_ERRORS_IMG_CALIBRATION   = ( 1 << 4 ),
-    SX126X_ERRORS_XOSC_START        = ( 1 << 5 ),
-    SX126X_ERRORS_PLL_LOCK          = ( 1 << 6 ),
-    SX126X_ERRORS_PA_RAMP           = ( 1 << 8 ),
+    SX126X_ERRORS_RC64K_CALIBRATION = (1 << 0),
+    SX126X_ERRORS_RC13M_CALIBRATION = (1 << 1),
+    SX126X_ERRORS_PLL_CALIBRATION = (1 << 2),
+    SX126X_ERRORS_ADC_CALIBRATION = (1 << 3),
+    SX126X_ERRORS_IMG_CALIBRATION = (1 << 4),
+    SX126X_ERRORS_XOSC_START = (1 << 5),
+    SX126X_ERRORS_PLL_LOCK = (1 << 6),
+    SX126X_ERRORS_PA_RAMP = (1 << 8),
 };
 
 typedef uint16_t sx126x_errors_mask_t;
@@ -640,7 +640,7 @@ typedef uint16_t sx126x_errors_mask_t;
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_sleep( const void* context, const sx126x_sleep_cfgs_t cfg );
+sx126x_status_t sx126x_set_sleep(const void *context, const sx126x_sleep_cfgs_t cfg);
 
 /**
  * @brief Set the chip in stand-by mode
@@ -650,7 +650,7 @@ sx126x_status_t sx126x_set_sleep( const void* context, const sx126x_sleep_cfgs_t
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_standby( const void* context, const sx126x_standby_cfg_t cfg );
+sx126x_status_t sx126x_set_standby(const void *context, const sx126x_standby_cfg_t cfg);
 
 /**
  * @brief Set the chip in frequency synthesis mode
@@ -659,7 +659,7 @@ sx126x_status_t sx126x_set_standby( const void* context, const sx126x_standby_cf
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_fs( const void* context );
+sx126x_status_t sx126x_set_fs(const void *context);
 
 /**
  * @brief Set the chip in transmission mode
@@ -677,7 +677,7 @@ sx126x_status_t sx126x_set_fs( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_tx( const void* context, const uint32_t timeout_in_ms );
+sx126x_status_t sx126x_set_tx(const void *context, const uint32_t timeout_in_ms);
 
 /**
  * @brief Set the chip in transmission mode
@@ -700,7 +700,7 @@ sx126x_status_t sx126x_set_tx( const void* context, const uint32_t timeout_in_ms
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_tx_with_timeout_in_rtc_step( const void* context, const uint32_t timeout_in_rtc_step );
+sx126x_status_t sx126x_set_tx_with_timeout_in_rtc_step(const void *context, const uint32_t timeout_in_rtc_step);
 
 /**
  * @brief Set the chip in reception mode
@@ -722,7 +722,7 @@ sx126x_status_t sx126x_set_tx_with_timeout_in_rtc_step( const void* context, con
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_rx( const void* context, const uint32_t timeout_in_ms );
+sx126x_status_t sx126x_set_rx(const void *context, const uint32_t timeout_in_ms);
 
 /**
  * @brief Set the chip in reception mode
@@ -750,7 +750,7 @@ sx126x_status_t sx126x_set_rx( const void* context, const uint32_t timeout_in_ms
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_rx_with_timeout_in_rtc_step( const void* context, const uint32_t timeout_in_rtc_step );
+sx126x_status_t sx126x_set_rx_with_timeout_in_rtc_step(const void *context, const uint32_t timeout_in_rtc_step);
 
 /**
  * @brief Configure the event on which the Rx timeout is stopped
@@ -764,7 +764,7 @@ sx126x_status_t sx126x_set_rx_with_timeout_in_rtc_step( const void* context, con
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_stop_timer_on_preamble( const void* context, const bool enable );
+sx126x_status_t sx126x_stop_timer_on_preamble(const void *context, const bool enable);
 
 /**
  * @brief Set the chip in reception mode with duty cycling
@@ -775,8 +775,8 @@ sx126x_status_t sx126x_stop_timer_on_preamble( const void* context, const bool e
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_rx_duty_cycle( const void* context, const uint32_t rx_time_in_ms,
-                                          const uint32_t sleep_time_in_ms );
+sx126x_status_t sx126x_set_rx_duty_cycle(const void *context, const uint32_t rx_time_in_ms,
+                                         const uint32_t sleep_time_in_ms);
 
 /**
  * @brief Set the chip in reception mode with duty cycling
@@ -795,9 +795,9 @@ sx126x_status_t sx126x_set_rx_duty_cycle( const void* context, const uint32_t rx
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_rx_duty_cycle_with_timings_in_rtc_step( const void*    context,
-                                                                   const uint32_t rx_time_in_rtc_step,
-                                                                   const uint32_t sleep_time_in_rtc_step );
+sx126x_status_t sx126x_set_rx_duty_cycle_with_timings_in_rtc_step(const void *context,
+                                                                  const uint32_t rx_time_in_rtc_step,
+                                                                  const uint32_t sleep_time_in_rtc_step);
 
 /**
  * @brief Set the chip in CAD (Channel Activity Detection) mode
@@ -810,7 +810,7 @@ sx126x_status_t sx126x_set_rx_duty_cycle_with_timings_in_rtc_step( const void*  
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_cad( const void* context );
+sx126x_status_t sx126x_set_cad(const void *context);
 
 /**
  * @brief Set the chip in Tx continuous wave (RF tone).
@@ -821,7 +821,7 @@ sx126x_status_t sx126x_set_cad( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_tx_cw( const void* context );
+sx126x_status_t sx126x_set_tx_cw(const void *context);
 
 /**
  * @brief Set the chip in Tx infinite preamble (modulated signal).
@@ -832,7 +832,7 @@ sx126x_status_t sx126x_set_tx_cw( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_tx_infinite_preamble( const void* context );
+sx126x_status_t sx126x_set_tx_infinite_preamble(const void *context);
 
 /**
  * @brief Configure the regulator mode to be used
@@ -845,7 +845,7 @@ sx126x_status_t sx126x_set_tx_infinite_preamble( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_reg_mode( const void* context, const sx126x_reg_mod_t mode );
+sx126x_status_t sx126x_set_reg_mode(const void *context, const sx126x_reg_mod_t mode);
 
 /**
  * @brief Perform the calibration of the requested blocks
@@ -860,7 +860,7 @@ sx126x_status_t sx126x_set_reg_mode( const void* context, const sx126x_reg_mod_t
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_cal( const void* context, const sx126x_cal_mask_t param );
+sx126x_status_t sx126x_cal(const void *context, const sx126x_cal_mask_t param);
 
 /**
  * @brief Launch an image calibration valid for all frequencies inside an interval, in steps
@@ -873,7 +873,7 @@ sx126x_status_t sx126x_cal( const void* context, const sx126x_cal_mask_t param )
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_cal_img( const void* context, const uint8_t freq1, const uint8_t freq2 );
+sx126x_status_t sx126x_cal_img(const void *context, const uint8_t freq1, const uint8_t freq2);
 
 /**
  * @brief Launch an image calibration valid for all frequencies inside an interval, in MHz
@@ -886,7 +886,7 @@ sx126x_status_t sx126x_cal_img( const void* context, const uint8_t freq1, const 
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_cal_img_in_mhz( const void* context, const uint16_t freq1_in_mhz, const uint16_t freq2_in_mhz );
+sx126x_status_t sx126x_cal_img_in_mhz(const void *context, const uint16_t freq1_in_mhz, const uint16_t freq2_in_mhz);
 
 /**
  * @brief Configure the PA (Power Amplifier)
@@ -898,7 +898,7 @@ sx126x_status_t sx126x_cal_img_in_mhz( const void* context, const uint16_t freq1
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_pa_cfg( const void* context, const sx126x_pa_cfg_params_t* params );
+sx126x_status_t sx126x_set_pa_cfg(const void *context, const sx126x_pa_cfg_params_t *params);
 
 /**
  * @brief Set chip mode to be used after successful transmission or reception.
@@ -910,7 +910,7 @@ sx126x_status_t sx126x_set_pa_cfg( const void* context, const sx126x_pa_cfg_para
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_rx_tx_fallback_mode( const void* context, const sx126x_fallback_modes_t fallback_mode );
+sx126x_status_t sx126x_set_rx_tx_fallback_mode(const void *context, const sx126x_fallback_modes_t fallback_mode);
 
 //
 // Registers and Buffer Access
@@ -928,8 +928,8 @@ sx126x_status_t sx126x_set_rx_tx_fallback_mode( const void* context, const sx126
  *
  * @see sx126x_read_register
  */
-sx126x_status_t sx126x_write_register( const void* context, const uint16_t address, const uint8_t* buffer,
-                                       const uint8_t size );
+sx126x_status_t sx126x_write_register(const void *context, const uint16_t address, const uint8_t *buffer,
+                                      const uint8_t size);
 
 /**
  * @brief Read data from register memory space.
@@ -943,8 +943,8 @@ sx126x_status_t sx126x_write_register( const void* context, const uint16_t addre
  *
  * @see sx126x_write_register
  */
-sx126x_status_t sx126x_read_register( const void* context, const uint16_t address, uint8_t* buffer,
-                                      const uint8_t size );
+sx126x_status_t sx126x_read_register(const void *context, const uint16_t address, uint8_t *buffer,
+                                     const uint8_t size);
 
 /**
  * @brief Write data into radio Tx buffer memory space.
@@ -958,8 +958,8 @@ sx126x_status_t sx126x_read_register( const void* context, const uint16_t addres
  *
  * @see sx126x_read_buffer
  */
-sx126x_status_t sx126x_write_buffer( const void* context, const uint8_t offset, const uint8_t* buffer,
-                                     const uint8_t size );
+sx126x_status_t sx126x_write_buffer(const void *context, const uint8_t offset, const uint8_t *buffer,
+                                    const uint8_t size);
 
 /**
  * @brief Read data from radio Rx buffer memory space.
@@ -973,7 +973,7 @@ sx126x_status_t sx126x_write_buffer( const void* context, const uint8_t offset, 
  *
  * @see sx126x_write_buffer
  */
-sx126x_status_t sx126x_read_buffer( const void* context, const uint8_t offset, uint8_t* buffer, const uint8_t size );
+sx126x_status_t sx126x_read_buffer(const void *context, const uint8_t offset, uint8_t *buffer, const uint8_t size);
 
 //
 // DIO and IRQ Control Functions
@@ -1002,8 +1002,8 @@ sx126x_status_t sx126x_read_buffer( const void* context, const uint8_t offset, u
  *
  * @see sx126x_clear_irq_status, sx126x_get_irq_status, sx126x_set_dio2_as_rf_sw_ctrl, sx126x_set_dio3_as_tcxo_ctrl
  */
-sx126x_status_t sx126x_set_dio_irq_params( const void* context, const uint16_t irq_mask, const uint16_t dio1_mask,
-                                           const uint16_t dio2_mask, const uint16_t dio3_mask );
+sx126x_status_t sx126x_set_dio_irq_params(const void *context, const uint16_t irq_mask, const uint16_t dio1_mask,
+                                          const uint16_t dio2_mask, const uint16_t dio3_mask);
 
 /**
  * @brief Get system interrupt status
@@ -1015,7 +1015,7 @@ sx126x_status_t sx126x_set_dio_irq_params( const void* context, const uint16_t i
  *
  * @see sx126x_clear_irq_status
  */
-sx126x_status_t sx126x_get_irq_status( const void* context, sx126x_irq_mask_t* irq );
+sx126x_status_t sx126x_get_irq_status(const void *context, sx126x_irq_mask_t *irq);
 
 /**
  * @brief Clear selected system interrupts
@@ -1027,7 +1027,7 @@ sx126x_status_t sx126x_get_irq_status( const void* context, sx126x_irq_mask_t* i
  *
  * @see sx126x_get_irq_status
  */
-sx126x_status_t sx126x_clear_irq_status( const void* context, const sx126x_irq_mask_t irq_mask );
+sx126x_status_t sx126x_clear_irq_status(const void *context, const sx126x_irq_mask_t irq_mask);
 
 /**
  * @brief Clears any radio irq status flags that are set and returns the flags that
@@ -1038,7 +1038,7 @@ sx126x_status_t sx126x_clear_irq_status( const void* context, const sx126x_irq_m
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_and_clear_irq_status( const void* context, sx126x_irq_mask_t* irq );
+sx126x_status_t sx126x_get_and_clear_irq_status(const void *context, sx126x_irq_mask_t *irq);
 
 /**
  * @brief Configure the embedded RF switch control
@@ -1048,7 +1048,7 @@ sx126x_status_t sx126x_get_and_clear_irq_status( const void* context, sx126x_irq
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_dio2_as_rf_sw_ctrl( const void* context, const bool enable );
+sx126x_status_t sx126x_set_dio2_as_rf_sw_ctrl(const void *context, const bool enable);
 
 /**
  * @brief Configure the embedded TCXO switch control
@@ -1064,8 +1064,8 @@ sx126x_status_t sx126x_set_dio2_as_rf_sw_ctrl( const void* context, const bool e
  * @returns Operation status
  *
  */
-sx126x_status_t sx126x_set_dio3_as_tcxo_ctrl( const void* context, const sx126x_tcxo_ctrl_voltages_t tcxo_voltage,
-                                              const uint32_t timeout );
+sx126x_status_t sx126x_set_dio3_as_tcxo_ctrl(const void *context, const sx126x_tcxo_ctrl_voltages_t tcxo_voltage,
+                                             const uint32_t timeout);
 
 //
 // RF Modulation and Packet-Related Functions
@@ -1081,7 +1081,7 @@ sx126x_status_t sx126x_set_dio3_as_tcxo_ctrl( const void* context, const sx126x_
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_rf_freq( const void* context, const uint32_t freq_in_hz );
+sx126x_status_t sx126x_set_rf_freq(const void *context, const uint32_t freq_in_hz);
 
 /**
  * @brief Set the RF frequency for future radio operations - parameter in PLL steps
@@ -1093,7 +1093,7 @@ sx126x_status_t sx126x_set_rf_freq( const void* context, const uint32_t freq_in_
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_rf_freq_in_pll_steps( const void* context, const uint32_t freq );
+sx126x_status_t sx126x_set_rf_freq_in_pll_steps(const void *context, const uint32_t freq);
 
 /**
  * @brief Set the packet type
@@ -1104,7 +1104,7 @@ sx126x_status_t sx126x_set_rf_freq_in_pll_steps( const void* context, const uint
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_pkt_type( const void* context, const sx126x_pkt_type_t pkt_type );
+sx126x_status_t sx126x_set_pkt_type(const void *context, const sx126x_pkt_type_t pkt_type);
 
 /**
  * @brief Get the current packet type
@@ -1114,7 +1114,7 @@ sx126x_status_t sx126x_set_pkt_type( const void* context, const sx126x_pkt_type_
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_pkt_type( const void* context, sx126x_pkt_type_t* pkt_type );
+sx126x_status_t sx126x_get_pkt_type(const void *context, sx126x_pkt_type_t *pkt_type);
 
 /**
  * @brief Set the parameters for TX power and power amplifier ramp time
@@ -1125,8 +1125,8 @@ sx126x_status_t sx126x_get_pkt_type( const void* context, sx126x_pkt_type_t* pkt
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_tx_params( const void* context, const int8_t pwr_in_dbm,
-                                      const sx126x_ramp_time_t ramp_time );
+sx126x_status_t sx126x_set_tx_params(const void *context, const int8_t pwr_in_dbm,
+                                     const sx126x_ramp_time_t ramp_time);
 
 /**
  * @brief Set the modulation parameters for GFSK packets
@@ -1139,7 +1139,7 @@ sx126x_status_t sx126x_set_tx_params( const void* context, const int8_t pwr_in_d
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_gfsk_mod_params( const void* context, const sx126x_mod_params_gfsk_t* params );
+sx126x_status_t sx126x_set_gfsk_mod_params(const void *context, const sx126x_mod_params_gfsk_t *params);
 
 /**
  * @brief Set the modulation parameters for LoRa packets
@@ -1151,7 +1151,7 @@ sx126x_status_t sx126x_set_gfsk_mod_params( const void* context, const sx126x_mo
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_lora_mod_params( const void* context, const sx126x_mod_params_lora_t* params );
+sx126x_status_t sx126x_set_lora_mod_params(const void *context, const sx126x_mod_params_lora_t *params);
 
 /**
  * @brief Set the packet parameters for GFSK packets
@@ -1164,7 +1164,7 @@ sx126x_status_t sx126x_set_lora_mod_params( const void* context, const sx126x_mo
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_gfsk_pkt_params( const void* context, const sx126x_pkt_params_gfsk_t* params );
+sx126x_status_t sx126x_set_gfsk_pkt_params(const void *context, const sx126x_pkt_params_gfsk_t *params);
 
 /**
  * @brief Set the packet parameters for LoRa packets
@@ -1176,7 +1176,7 @@ sx126x_status_t sx126x_set_gfsk_pkt_params( const void* context, const sx126x_pk
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_lora_pkt_params( const void* context, const sx126x_pkt_params_lora_t* params );
+sx126x_status_t sx126x_set_lora_pkt_params(const void *context, const sx126x_pkt_params_lora_t *params);
 
 /**
  * @brief Set the parameters for CAD operation
@@ -1188,7 +1188,7 @@ sx126x_status_t sx126x_set_lora_pkt_params( const void* context, const sx126x_pk
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_cad_params( const void* context, const sx126x_cad_params_t* params );
+sx126x_status_t sx126x_set_cad_params(const void *context, const sx126x_cad_params_t *params);
 
 /**
  * @brief Set buffer start addresses for both Tx and Rx operations
@@ -1199,8 +1199,8 @@ sx126x_status_t sx126x_set_cad_params( const void* context, const sx126x_cad_par
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_buffer_base_address( const void* context, const uint8_t tx_base_address,
-                                                const uint8_t rx_base_address );
+sx126x_status_t sx126x_set_buffer_base_address(const void *context, const uint8_t tx_base_address,
+                                               const uint8_t rx_base_address);
 
 /**
  * @brief Set the timeout to be used when the chip is configured in Rx mode (only in LoRa)
@@ -1213,7 +1213,7 @@ sx126x_status_t sx126x_set_buffer_base_address( const void* context, const uint8
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_lora_symb_nb_timeout( const void* context, const uint8_t nb_of_symbs );
+sx126x_status_t sx126x_set_lora_symb_nb_timeout(const void *context, const uint8_t nb_of_symbs);
 
 //
 // Communication Status Information
@@ -1227,7 +1227,7 @@ sx126x_status_t sx126x_set_lora_symb_nb_timeout( const void* context, const uint
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_status( const void* context, sx126x_chip_status_t* radio_status );
+sx126x_status_t sx126x_get_status(const void *context, sx126x_chip_status_t *radio_status);
 
 /**
  * @brief Get the current Rx buffer status for both LoRa and GFSK Rx operations
@@ -1240,7 +1240,7 @@ sx126x_status_t sx126x_get_status( const void* context, sx126x_chip_status_t* ra
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_rx_buffer_status( const void* context, sx126x_rx_buffer_status_t* rx_buffer_status );
+sx126x_status_t sx126x_get_rx_buffer_status(const void *context, sx126x_rx_buffer_status_t *rx_buffer_status);
 
 /**
  * @brief Get the status of the last GFSK packet received
@@ -1250,7 +1250,7 @@ sx126x_status_t sx126x_get_rx_buffer_status( const void* context, sx126x_rx_buff
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_gfsk_pkt_status( const void* context, sx126x_pkt_status_gfsk_t* pkt_status );
+sx126x_status_t sx126x_get_gfsk_pkt_status(const void *context, sx126x_pkt_status_gfsk_t *pkt_status);
 
 /**
  * @brief Get the status of the last LoRa packet received
@@ -1260,7 +1260,7 @@ sx126x_status_t sx126x_get_gfsk_pkt_status( const void* context, sx126x_pkt_stat
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_lora_pkt_status( const void* context, sx126x_pkt_status_lora_t* pkt_status );
+sx126x_status_t sx126x_get_lora_pkt_status(const void *context, sx126x_pkt_status_lora_t *pkt_status);
 
 /**
  * @brief Get the instantaneous RSSI value.
@@ -1274,7 +1274,7 @@ sx126x_status_t sx126x_get_lora_pkt_status( const void* context, sx126x_pkt_stat
  *
  * @see sx126x_set_rx
  */
-sx126x_status_t sx126x_get_rssi_inst( const void* context, int16_t* rssi_in_dbm );
+sx126x_status_t sx126x_get_rssi_inst(const void *context, int16_t *rssi_in_dbm);
 
 /**
  * @brief Get the statistics about GFSK communication
@@ -1284,7 +1284,7 @@ sx126x_status_t sx126x_get_rssi_inst( const void* context, int16_t* rssi_in_dbm 
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_gfsk_stats( const void* context, sx126x_stats_gfsk_t* stats );
+sx126x_status_t sx126x_get_gfsk_stats(const void *context, sx126x_stats_gfsk_t *stats);
 
 /**
  * @brief Get the statistics about LoRa communication
@@ -1294,7 +1294,7 @@ sx126x_status_t sx126x_get_gfsk_stats( const void* context, sx126x_stats_gfsk_t*
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_lora_stats( const void* context, sx126x_stats_lora_t* stats );
+sx126x_status_t sx126x_get_lora_stats(const void *context, sx126x_stats_lora_t *stats);
 
 /**
  * @brief Reset all the statistics for both Lora and GFSK communications
@@ -1303,7 +1303,7 @@ sx126x_status_t sx126x_get_lora_stats( const void* context, sx126x_stats_lora_t*
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_reset_stats( const void* context );
+sx126x_status_t sx126x_reset_stats(const void *context);
 
 //
 // Miscellaneous
@@ -1316,7 +1316,7 @@ sx126x_status_t sx126x_reset_stats( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_reset( const void* context );
+sx126x_status_t sx126x_reset(const void *context);
 
 /**
  * @brief Wake the radio up from sleep mode.
@@ -1325,7 +1325,7 @@ sx126x_status_t sx126x_reset( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_wakeup( const void* context );
+sx126x_status_t sx126x_wakeup(const void *context);
 
 /**
  * @brief Get the list of all active errors
@@ -1335,7 +1335,7 @@ sx126x_status_t sx126x_wakeup( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_device_errors( const void* context, sx126x_errors_mask_t* errors );
+sx126x_status_t sx126x_get_device_errors(const void *context, sx126x_errors_mask_t *errors);
 
 /**
  * @brief Clear all active errors
@@ -1344,7 +1344,7 @@ sx126x_status_t sx126x_get_device_errors( const void* context, sx126x_errors_mas
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_clear_device_errors( const void* context );
+sx126x_status_t sx126x_clear_device_errors(const void *context);
 
 /**
  * @brief Get the parameter corresponding to a GFSK Rx bandwith immediately above the minimum requested one.
@@ -1354,7 +1354,7 @@ sx126x_status_t sx126x_clear_device_errors( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_gfsk_bw_param( const uint32_t bw, uint8_t* param );
+sx126x_status_t sx126x_get_gfsk_bw_param(const uint32_t bw, uint8_t *param);
 
 /**
  * @brief Get the actual value in Hertz of a given LoRa bandwidth
@@ -1363,7 +1363,7 @@ sx126x_status_t sx126x_get_gfsk_bw_param( const uint32_t bw, uint8_t* param );
  *
  * @returns Actual LoRa bandwidth in Hertz
  */
-uint32_t sx126x_get_lora_bw_in_hz( sx126x_lora_bw_t bw );
+uint32_t sx126x_get_lora_bw_in_hz(sx126x_lora_bw_t bw);
 
 /**
  * @brief Compute the numerator for LoRa time-on-air computation.
@@ -1375,8 +1375,8 @@ uint32_t sx126x_get_lora_bw_in_hz( sx126x_lora_bw_t bw );
  *
  * @returns LoRa time-on-air numerator
  */
-uint32_t sx126x_get_lora_time_on_air_numerator( const sx126x_pkt_params_lora_t* pkt_p,
-                                                const sx126x_mod_params_lora_t* mod_p );
+uint32_t sx126x_get_lora_time_on_air_numerator(const sx126x_pkt_params_lora_t *pkt_p,
+                                               const sx126x_mod_params_lora_t *mod_p);
 
 /**
  * @brief Get the time on air in ms for LoRa transmission
@@ -1386,8 +1386,8 @@ uint32_t sx126x_get_lora_time_on_air_numerator( const sx126x_pkt_params_lora_t* 
  *
  * @returns Time-on-air value in ms for LoRa transmission
  */
-uint32_t sx126x_get_lora_time_on_air_in_ms( const sx126x_pkt_params_lora_t* pkt_p,
-                                            const sx126x_mod_params_lora_t* mod_p );
+uint32_t sx126x_get_lora_time_on_air_in_ms(const sx126x_pkt_params_lora_t *pkt_p,
+                                           const sx126x_mod_params_lora_t *mod_p);
 
 /**
  * @brief Compute the numerator for GFSK time-on-air computation.
@@ -1399,7 +1399,7 @@ uint32_t sx126x_get_lora_time_on_air_in_ms( const sx126x_pkt_params_lora_t* pkt_
  *
  * @returns GFSK time-on-air numerator
  */
-uint32_t sx126x_get_gfsk_time_on_air_numerator( const sx126x_pkt_params_gfsk_t* pkt_p );
+uint32_t sx126x_get_gfsk_time_on_air_numerator(const sx126x_pkt_params_gfsk_t *pkt_p);
 
 /**
  * @brief Get the time on air in ms for GFSK transmission
@@ -1409,8 +1409,8 @@ uint32_t sx126x_get_gfsk_time_on_air_numerator( const sx126x_pkt_params_gfsk_t* 
  *
  * @returns Time-on-air value in ms for GFSK transmission
  */
-uint32_t sx126x_get_gfsk_time_on_air_in_ms( const sx126x_pkt_params_gfsk_t* pkt_p,
-                                            const sx126x_mod_params_gfsk_t* mod_p );
+uint32_t sx126x_get_gfsk_time_on_air_in_ms(const sx126x_pkt_params_gfsk_t *pkt_p,
+                                           const sx126x_mod_params_gfsk_t *mod_p);
 
 /**
  * @brief Generate one or more 32-bit random numbers.
@@ -1432,7 +1432,7 @@ uint32_t sx126x_get_gfsk_time_on_air_in_ms( const sx126x_pkt_params_gfsk_t* pkt_
  * Please note that the random numbers produced by the generator do not have a uniform or Gaussian distribution. If
  * uniformity is needed, perform appropriate software post-processing.
  */
-sx126x_status_t sx126x_get_random_numbers( const void* context, uint32_t* numbers, unsigned int n );
+sx126x_status_t sx126x_get_random_numbers(const void *context, uint32_t *numbers, unsigned int n);
 
 /**
  * @brief Get the number of PLL steps for a given frequency in Hertz
@@ -1441,7 +1441,7 @@ sx126x_status_t sx126x_get_random_numbers( const void* context, uint32_t* number
  *
  * @returns Number of PLL steps
  */
-uint32_t sx126x_convert_freq_in_hz_to_pll_step( uint32_t freq_in_hz );
+uint32_t sx126x_convert_freq_in_hz_to_pll_step(uint32_t freq_in_hz);
 
 /**
  * @brief Get the number of RTC steps for a given timeout in millisecond
@@ -1450,7 +1450,7 @@ uint32_t sx126x_convert_freq_in_hz_to_pll_step( uint32_t freq_in_hz );
  *
  * @returns Number of RTC steps
  */
-uint32_t sx126x_convert_timeout_in_ms_to_rtc_step( uint32_t timeout_in_ms );
+uint32_t sx126x_convert_timeout_in_ms_to_rtc_step(uint32_t timeout_in_ms);
 
 //
 // Registers access
@@ -1467,7 +1467,7 @@ uint32_t sx126x_convert_timeout_in_ms_to_rtc_step( uint32_t timeout_in_ms );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_cfg_rx_boosted( const void* context, const bool state );
+sx126x_status_t sx126x_cfg_rx_boosted(const void *context, const bool state);
 
 /**
  * @brief Configure the sync word used in GFSK packet
@@ -1478,7 +1478,7 @@ sx126x_status_t sx126x_cfg_rx_boosted( const void* context, const bool state );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_gfsk_sync_word( const void* context, const uint8_t* sync_word, const uint8_t sync_word_len );
+sx126x_status_t sx126x_set_gfsk_sync_word(const void *context, const uint8_t *sync_word, const uint8_t sync_word_len);
 
 /**
  * @brief Configure the sync word used in LoRa packet
@@ -1492,7 +1492,7 @@ sx126x_status_t sx126x_set_gfsk_sync_word( const void* context, const uint8_t* s
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_lora_sync_word( const void* context, const uint8_t sync_word );
+sx126x_status_t sx126x_set_lora_sync_word(const void *context, const uint8_t sync_word);
 
 /**
  * @brief Configure the seed used to compute CRC in GFSK packet
@@ -1502,7 +1502,7 @@ sx126x_status_t sx126x_set_lora_sync_word( const void* context, const uint8_t sy
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_gfsk_crc_seed( const void* context, uint16_t seed );
+sx126x_status_t sx126x_set_gfsk_crc_seed(const void *context, uint16_t seed);
 
 /**
  * @brief Configure the polynomial used to compute CRC in GFSK packet
@@ -1512,7 +1512,7 @@ sx126x_status_t sx126x_set_gfsk_crc_seed( const void* context, uint16_t seed );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_gfsk_crc_polynomial( const void* context, const uint16_t polynomial );
+sx126x_status_t sx126x_set_gfsk_crc_polynomial(const void *context, const uint16_t polynomial);
 
 /**
  * @brief Configure the whitening seed used in GFSK packet
@@ -1522,7 +1522,7 @@ sx126x_status_t sx126x_set_gfsk_crc_polynomial( const void* context, const uint1
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_gfsk_whitening_seed( const void* context, const uint16_t seed );
+sx126x_status_t sx126x_set_gfsk_whitening_seed(const void *context, const uint16_t seed);
 
 /**
  * @brief Configure the Tx PA clamp
@@ -1535,7 +1535,7 @@ sx126x_status_t sx126x_set_gfsk_whitening_seed( const void* context, const uint1
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_cfg_tx_clamp( const void* context );
+sx126x_status_t sx126x_cfg_tx_clamp(const void *context);
 
 /**
  * @brief Stop the RTC and clear the related event
@@ -1547,7 +1547,7 @@ sx126x_status_t sx126x_cfg_tx_clamp( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_stop_rtc( const void* context );
+sx126x_status_t sx126x_stop_rtc(const void *context);
 
 /**
  * @brief Configure the Over Current Protection (OCP) value
@@ -1559,7 +1559,7 @@ sx126x_status_t sx126x_stop_rtc( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_ocp_value( const void* context, const uint8_t ocp_in_step_of_2_5_ma );
+sx126x_status_t sx126x_set_ocp_value(const void *context, const uint8_t ocp_in_step_of_2_5_ma);
 
 /**
  * @brief Configure the internal trimming capacitor values
@@ -1573,8 +1573,8 @@ sx126x_status_t sx126x_set_ocp_value( const void* context, const uint8_t ocp_in_
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_set_trimming_capacitor_values( const void* context, const uint8_t trimming_cap_xta,
-                                                      const uint8_t trimming_cap_xtb );
+sx126x_status_t sx126x_set_trimming_capacitor_values(const void *context, const uint8_t trimming_cap_xta,
+                                                     const uint8_t trimming_cap_xtb);
 
 /**
  * @brief Add registers to the retention list
@@ -1590,8 +1590,8 @@ sx126x_status_t sx126x_set_trimming_capacitor_values( const void* context, const
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_add_registers_to_retention_list( const void* context, const uint16_t* register_addr,
-                                                        uint8_t register_nb );
+sx126x_status_t sx126x_add_registers_to_retention_list(const void *context, const uint16_t *register_addr,
+                                                       uint8_t register_nb);
 
 /**
  * @brief Add SX126X_REG_RXGAIN, SX126X_REG_TX_MODULATION and SX126X_REG_IQ_POLARITY registers to the retention list
@@ -1607,7 +1607,7 @@ sx126x_status_t sx126x_add_registers_to_retention_list( const void* context, con
  *
  * @see sx126x_add_registers_to_retention_list
  */
-sx126x_status_t sx126x_init_retention_list( const void* context );
+sx126x_status_t sx126x_init_retention_list(const void *context);
 
 /**
  * @brief Get LoRa coding rate and CRC configurations from received header
@@ -1622,7 +1622,7 @@ sx126x_status_t sx126x_init_retention_list( const void* context );
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_get_lora_params_from_header( const void* context, sx126x_lora_cr_t* cr, bool* crc_is_on );
+sx126x_status_t sx126x_get_lora_params_from_header(const void *context, sx126x_lora_cr_t *cr, bool *crc_is_on);
 
 #ifdef __cplusplus
 }

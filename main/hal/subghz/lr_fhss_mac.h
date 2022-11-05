@@ -90,7 +90,7 @@ typedef struct lr_fhss_digest_s
 {
     uint16_t nb_bytes; /**< Length of LR-FHSS frame, in bytes */
     uint16_t nb_bits;  /**< Number of bits */
-    uint8_t  nb_hops;  /**< Number of hops */
+    uint8_t nb_hops;  /**< Number of hops */
 } lr_fhss_digest_t;
 
 /**
@@ -121,7 +121,7 @@ extern "C" {
  *
  * @returns Number of valid hop sequences (512 or 384)
  */
-unsigned int lr_fhss_get_hop_sequence_count( const lr_fhss_v1_params_t* params );
+unsigned int lr_fhss_get_hop_sequence_count(const lr_fhss_v1_params_t *params);
 
 /**
  * @brief Fill the digest structure with various size-related data for a LR-FHSS frame
@@ -130,7 +130,7 @@ unsigned int lr_fhss_get_hop_sequence_count( const lr_fhss_v1_params_t* params )
  * @param  [in] payload_length Length of payload, in bytes
  * @param [out] digest         Contains block count byte count, and number of hops
  */
-void lr_fhss_process_parameters( const lr_fhss_v1_params_t* params, uint16_t payload_length, lr_fhss_digest_t* digest );
+void lr_fhss_process_parameters(const lr_fhss_v1_params_t *params, uint16_t payload_length, lr_fhss_digest_t *digest);
 
 /**
  * @brief Fill the hop structure with various hop-related data for a LR-FHSS frame, and provide initial state
@@ -142,8 +142,8 @@ void lr_fhss_process_parameters( const lr_fhss_v1_params_t* params, uint16_t pay
  *
  * @returns Operation status
  */
-lr_fhss_status_t lr_fhss_get_hop_params( const lr_fhss_v1_params_t* params, lr_fhss_hop_params_t* hop_params,
-                                         uint16_t* initial_state, uint16_t hop_sequence_id );
+lr_fhss_status_t lr_fhss_get_hop_params(const lr_fhss_v1_params_t *params, lr_fhss_hop_params_t *hop_params,
+                                        uint16_t *initial_state, uint16_t hop_sequence_id);
 
 /**
  * @brief Update the LFSR state by performing a hop, and return the hop grid position
@@ -153,7 +153,7 @@ lr_fhss_status_t lr_fhss_get_hop_params( const lr_fhss_v1_params_t* params, lr_f
  *
  * @returns Hop position in the grid
  */
-uint16_t lr_fhss_get_next_state( uint16_t* lfsr_state, const lr_fhss_hop_params_t* hop_params );
+uint16_t lr_fhss_get_next_state(uint16_t *lfsr_state, const lr_fhss_hop_params_t *hop_params);
 
 /**
  * @brief Return the frequency in grid units for given LR-FHSS parameters and hop index
@@ -164,8 +164,8 @@ uint16_t lr_fhss_get_next_state( uint16_t* lfsr_state, const lr_fhss_hop_params_
  *
  * @returns Frequency, in grid units
  */
-int16_t lr_fhss_get_next_freq_in_grid( uint16_t* lfsr_state, const lr_fhss_hop_params_t* hop_params,
-                                       const lr_fhss_v1_params_t* params );
+int16_t lr_fhss_get_next_freq_in_grid(uint16_t *lfsr_state, const lr_fhss_hop_params_t *hop_params,
+                                      const lr_fhss_v1_params_t *params);
 
 /**
  * @brief Construct the LR-FHSS frame
@@ -179,8 +179,8 @@ int16_t lr_fhss_get_next_freq_in_grid( uint16_t* lfsr_state, const lr_fhss_hop_p
  *
  * @returns Length of frame, in bytes
  */
-uint16_t lr_fhss_build_frame( const lr_fhss_v1_params_t* params, uint16_t hop_sequence_id, const uint8_t* data_in,
-                              uint16_t data_in_bytecount, uint8_t* data_out );
+uint16_t lr_fhss_build_frame(const lr_fhss_v1_params_t *params, uint16_t hop_sequence_id, const uint8_t *data_in,
+                             uint16_t data_in_bytecount, uint8_t *data_out);
 
 /**
  * @brief Compute the numerator for LR-FHSS time-on-air computation.
@@ -193,10 +193,10 @@ uint16_t lr_fhss_build_frame( const lr_fhss_v1_params_t* params, uint16_t hop_se
  *
  * @returns LR-FHSS time-on-air numerator
  */
-static inline uint32_t lr_fhss_get_time_on_air_numerator( const lr_fhss_v1_params_t* params, uint16_t payload_length )
+static inline uint32_t lr_fhss_get_time_on_air_numerator(const lr_fhss_v1_params_t *params, uint16_t payload_length)
 {
     lr_fhss_digest_t digest;
-    lr_fhss_process_parameters( params, payload_length, &digest );
+    lr_fhss_process_parameters(params, payload_length, &digest);
 
     return digest.nb_bits;
 }
@@ -209,7 +209,7 @@ static inline uint32_t lr_fhss_get_time_on_air_numerator( const lr_fhss_v1_param
  *
  * @returns Time-on-air value in ms for LR-FHSS transmission
  */
-uint32_t lr_fhss_get_time_on_air_in_ms( const lr_fhss_v1_params_t* params, uint16_t payload_length );
+uint32_t lr_fhss_get_time_on_air_in_ms(const lr_fhss_v1_params_t *params, uint16_t payload_length);
 
 #ifdef __cplusplus
 }

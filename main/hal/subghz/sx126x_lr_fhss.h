@@ -71,8 +71,8 @@
 typedef struct sx126x_lr_fhss_params_s
 {
     lr_fhss_v1_params_t lr_fhss_params;
-    uint32_t            center_freq_in_pll_steps; /**< Center frequency in transceiver units */
-    int8_t              device_offset;  //<! Per device offset to avoid collisions over the air. Possible values:
+    uint32_t center_freq_in_pll_steps; /**< Center frequency in transceiver units */
+    int8_t device_offset;  //<! Per device offset to avoid collisions over the air. Possible values:
     //<! - if (lr_fhss_params.grid == LR_FHSS_V1_GRID_25391_HZ): [-26, 25]
     //<! - if (lr_fhss_params.grid == LR_FHSS_V1_GRID_3906_HZ): [-4, 3]
 } sx126x_lr_fhss_params_t;
@@ -83,10 +83,10 @@ typedef struct sx126x_lr_fhss_params_s
 typedef struct sx126x_lr_fhss_state_s
 {
     lr_fhss_hop_params_t hop_params;
-    lr_fhss_digest_t     digest;
-    uint32_t             next_freq_in_pll_steps; /**< Frequency that will be used on next hop */
-    uint16_t             lfsr_state;             /**< LFSR state for hop sequence generation */
-    uint8_t              current_hop;            /**< Index of the current hop */
+    lr_fhss_digest_t digest;
+    uint32_t next_freq_in_pll_steps; /**< Frequency that will be used on next hop */
+    uint16_t lfsr_state;             /**< LFSR state for hop sequence generation */
+    uint8_t current_hop;            /**< Index of the current hop */
 } sx126x_lr_fhss_state_t;
 
 /*
@@ -106,7 +106,7 @@ extern "C" {
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_lr_fhss_init( const void* context, const sx126x_lr_fhss_params_t* params );
+sx126x_status_t sx126x_lr_fhss_init(const void *context, const sx126x_lr_fhss_params_t *params);
 
 /**
  * @brief Check the parameters, and in case of success, generate the digest summary which contains important size info
@@ -122,8 +122,8 @@ sx126x_status_t sx126x_lr_fhss_init( const void* context, const sx126x_lr_fhss_p
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_lr_fhss_process_parameters( const sx126x_lr_fhss_params_t* params, uint16_t hop_sequence_id,
-                                                   uint16_t payload_length, sx126x_lr_fhss_state_t* state );
+sx126x_status_t sx126x_lr_fhss_process_parameters(const sx126x_lr_fhss_params_t *params, uint16_t hop_sequence_id,
+                                                  uint16_t payload_length, sx126x_lr_fhss_state_t *state);
 
 /**
  * @brief Sent the initial hopping confifguration to the radio
@@ -138,8 +138,8 @@ sx126x_status_t sx126x_lr_fhss_process_parameters( const sx126x_lr_fhss_params_t
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_lr_fhss_write_hop_sequence_head( const void* context, const sx126x_lr_fhss_params_t* params,
-                                                        sx126x_lr_fhss_state_t* state );
+sx126x_status_t sx126x_lr_fhss_write_hop_sequence_head(const void *context, const sx126x_lr_fhss_params_t *params,
+                                                       sx126x_lr_fhss_state_t *state);
 
 /**
  * @brief Write physical LR-FHSS payload to radio
@@ -153,8 +153,8 @@ sx126x_status_t sx126x_lr_fhss_write_hop_sequence_head( const void* context, con
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_lr_fhss_write_payload( const void* context, const sx126x_lr_fhss_state_t* state,
-                                              const uint8_t* payload );
+sx126x_status_t sx126x_lr_fhss_write_payload(const void *context, const sx126x_lr_fhss_state_t *state,
+                                             const uint8_t *payload);
 
 /**
  * @brief Check parameter validity, build a frame, then send it
@@ -174,10 +174,10 @@ sx126x_status_t sx126x_lr_fhss_write_payload( const void* context, const sx126x_
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_lr_fhss_build_frame( const void* context, const sx126x_lr_fhss_params_t* params,
-                                            sx126x_lr_fhss_state_t* state, uint16_t hop_sequence_id,
-                                            const uint8_t* payload, uint16_t payload_length,
-                                            uint32_t* first_frequency_in_pll_steps );
+sx126x_status_t sx126x_lr_fhss_build_frame(const void *context, const sx126x_lr_fhss_params_t *params,
+                                           sx126x_lr_fhss_state_t *state, uint16_t hop_sequence_id,
+                                           const uint8_t *payload, uint16_t payload_length,
+                                           uint32_t *first_frequency_in_pll_steps);
 
 /**
  * @brief Perform an actual frequency hop
@@ -192,8 +192,8 @@ sx126x_status_t sx126x_lr_fhss_build_frame( const void* context, const sx126x_lr
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_lr_fhss_handle_hop( const void* context, const sx126x_lr_fhss_params_t* params,
-                                           sx126x_lr_fhss_state_t* state );
+sx126x_status_t sx126x_lr_fhss_handle_hop(const void *context, const sx126x_lr_fhss_params_t *params,
+                                          sx126x_lr_fhss_state_t *state);
 
 /**
  * @brief Indicate to the radio that frequency hopping is no longer needed
@@ -206,8 +206,8 @@ sx126x_status_t sx126x_lr_fhss_handle_hop( const void* context, const sx126x_lr_
  *
  * @returns Operation status
  */
-sx126x_status_t sx126x_lr_fhss_handle_tx_done( const void* context, const sx126x_lr_fhss_params_t* params,
-                                               sx126x_lr_fhss_state_t* state );
+sx126x_status_t sx126x_lr_fhss_handle_tx_done(const void *context, const sx126x_lr_fhss_params_t *params,
+                                              sx126x_lr_fhss_state_t *state);
 
 /**
  * @brief Get the time on air in ms for LR-FHSS transmission
@@ -217,10 +217,10 @@ sx126x_status_t sx126x_lr_fhss_handle_tx_done( const void* context, const sx126x
  *
  * @returns Time-on-air value in ms for LR-FHSS transmission
  */
-static inline uint32_t sx126x_lr_fhss_get_time_on_air_in_ms( const sx126x_lr_fhss_params_t* params,
-                                                             uint16_t                       payload_length )
+static inline uint32_t sx126x_lr_fhss_get_time_on_air_in_ms(const sx126x_lr_fhss_params_t *params,
+                                                            uint16_t payload_length)
 {
-    return lr_fhss_get_time_on_air_in_ms( &params->lr_fhss_params, payload_length );
+    return lr_fhss_get_time_on_air_in_ms(&params->lr_fhss_params, payload_length);
 }
 
 /**
@@ -230,9 +230,9 @@ static inline uint32_t sx126x_lr_fhss_get_time_on_air_in_ms( const sx126x_lr_fhs
  *
  * @return Returns the number of valid hop sequences (512 or 384)
  */
-static inline unsigned int sx126x_lr_fhss_get_hop_sequence_count( const sx126x_lr_fhss_params_t* params )
+static inline unsigned int sx126x_lr_fhss_get_hop_sequence_count(const sx126x_lr_fhss_params_t *params)
 {
-    return lr_fhss_get_hop_sequence_count( &params->lr_fhss_params );
+    return lr_fhss_get_hop_sequence_count(&params->lr_fhss_params);
 }
 
 #ifdef __cplusplus
