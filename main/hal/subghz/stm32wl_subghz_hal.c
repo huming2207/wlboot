@@ -109,12 +109,10 @@ sx126x_hal_status_t sx126x_hal_write(const void *context, const uint8_t *command
         }
     }
 
-    // NSS = 1
-    LL_PWR_UnselectSUBGHZSPI_NSS();
-
     // Wait if busy
     if (command[0] != RADIO_SET_SLEEP) {
         if (!subghz_wait_on_busy()) {
+            LL_PWR_UnselectSUBGHZSPI_NSS();
             if (!primask) {
                 __enable_irq();
             }
@@ -125,8 +123,6 @@ sx126x_hal_status_t sx126x_hal_write(const void *context, const uint8_t *command
 
     // Send data, if exists
     if (data != NULL && data_length > 0) {
-        // NSS = 0
-        LL_PWR_SelectSUBGHZSPI_NSS();
         for (uint16_t idx = 0; idx < data_length; idx += 1) {
             if (!subghz_spi_send_byte(data[idx])) {
                 LL_PWR_UnselectSUBGHZSPI_NSS();
@@ -137,10 +133,10 @@ sx126x_hal_status_t sx126x_hal_write(const void *context, const uint8_t *command
                 return SX126X_HAL_STATUS_ERROR;
             }
         }
-
-        // NSS = 1
-        LL_PWR_UnselectSUBGHZSPI_NSS();
     }
+
+    // NSS = 1
+    LL_PWR_UnselectSUBGHZSPI_NSS();
 
     // Wait if busy
     if (command[0] != RADIO_SET_SLEEP) {
@@ -180,12 +176,10 @@ sx126x_hal_status_t sx126x_hal_read(const void *context, const uint8_t *command,
         }
     }
 
-    // NSS = 1
-    LL_PWR_UnselectSUBGHZSPI_NSS();
-
     // Wait if busy
     if (command[0] != RADIO_SET_SLEEP) {
         if (!subghz_wait_on_busy()) {
+            LL_PWR_UnselectSUBGHZSPI_NSS();
             if (!primask) {
                 __enable_irq();
             }
@@ -209,10 +203,11 @@ sx126x_hal_status_t sx126x_hal_read(const void *context, const uint8_t *command,
 
             data += 1;
         }
-
-        // NSS = 1
-        LL_PWR_UnselectSUBGHZSPI_NSS();
     }
+
+
+    // NSS = 1
+    LL_PWR_UnselectSUBGHZSPI_NSS();
 
     if (!primask) {
         __enable_irq();
@@ -239,7 +234,6 @@ sx126x_hal_status_t sx126x_hal_reset(const void *context)
 
 sx126x_hal_status_t sx126x_hal_wakeup(const void *context)
 {
-
     (void)context;
 
     // See SX1262 datasheet, Chapter 9.3 "Sleep Mode" - assert NSS to wake up
