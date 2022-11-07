@@ -49,7 +49,7 @@ if (CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
     )
 
     target_link_options(wlboot PUBLIC
-            -T\"${CMAKE_CURRENT_LIST_DIR}/misc/stm32wle5.ld\"
+            -T${CMAKE_CURRENT_LIST_DIR}/misc/stm32wle5.ld
             -Wl,-Map=\"${PROJECT_NAME}.map\"
             -lc -lrdimon --specs=rdimon.specs -flto -Os
             -Wl,--gc-sections
@@ -71,9 +71,9 @@ elseif(CMAKE_BUILD_TYPE MATCHES Release)
     )
 
     target_link_options(wlboot PUBLIC
-            -T\"${CMAKE_CURRENT_LIST_DIR}/misc/stm32wle5.ld\"
+            -T${CMAKE_CURRENT_LIST_DIR}/misc/stm32wle5.ld
             -Wl,-Map=\"${PROJECT_NAME}.map\"
-            -Wl,--gc-sections -flto -Os --specs=nano.specs
+            -Wl,--gc-sections -flto -Os -specs=nano.specs -specs=nosys.specs
             -mthumb -mcpu=cortex-m4 -mfloat-abi=soft
     )
 
