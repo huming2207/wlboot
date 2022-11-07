@@ -4,7 +4,9 @@
 
 #include <lpuart.hpp>
 
+#ifndef DISABLE_LOG
 extern "C" void initialise_monitor_handles(void);
+#endif
 
 static void SystemClock_Config()
 {
@@ -48,13 +50,15 @@ static void SystemClock_Config()
     LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
     /* Update CMSIS variable (which can be updated also through SystemCoreClockUpdate function) */
     LL_SetSystemCoreClock(48000000);
-    HAL_InitTick (TICK_INT_PRIORITY);
+    LL_Init1msTick(48000000);
 }
 
 int main()
 {
+#ifndef DISABLE_LOG
     initialise_monitor_handles();
-    HAL_Init();
+#endif
+    
     SystemClock_Config();
 
     printf("wtf1\n");
