@@ -1,6 +1,7 @@
 #include <cstdio>
 #include "stm32wlxx_hal.h"
 #include "stm32wlxx_ll_utils.h"
+#include "subghz.hpp"
 
 #include <lpuart.hpp>
 
@@ -58,17 +59,17 @@ int main()
 #ifndef DISABLE_LOG
     initialise_monitor_handles();
 #endif
-    
+
     SystemClock_Config();
+    auto *uart = lpuart::instance();
+    auto *lora= subghz::instance();
 
-    printf("wtf1\n");
-
-    printf("wtf2\n");
-
-    lpuart::instance()->init();
+    uart->init();
+    lora->init();
 
     while (true) {
-        lpuart::instance()->handle_task();
+        uart->handle_task();
+        lora->handle_task();
     }
 }
 
