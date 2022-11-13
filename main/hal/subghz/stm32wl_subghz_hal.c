@@ -262,6 +262,14 @@ sx126x_hal_status_t sx126x_hal_wakeup(const void *context)
 bool stm32wl_subghz_init()
 {
     LL_APB3_GRP1_EnableClock(LL_APB3_GRP1_PERIPH_SUBGHZSPI);
+    if (!LL_RCC_HSE_IsReady()) {
+#ifdef STM32WL_HAS_TCXO
+        LL_RCC_HSE_EnableTcxo();
+#endif
+        LL_RCC_HSE_Enable();
+        while (LL_RCC_HSE_IsReady() == 0) {}
+    }
+
     NVIC_SetPriority(SUBGHZ_Radio_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
     NVIC_EnableIRQ(SUBGHZ_Radio_IRQn);
 
