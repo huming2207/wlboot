@@ -1,4 +1,6 @@
 #include <stm32wlxx_it.h>
+#include <algorithm>
+#include <cstring>
 #include "subghz.hpp"
 
 #include "subghz/sx126x.h"
@@ -74,13 +76,44 @@ void subghz::handle_task()
     volatile sx126x_irq_mask_t irq_status = last_irq_status;
     last_irq_status = 0;
 
-    if (irq_status & SX126X_IRQ_RX_DONE) {
+    if ((irq_status & SX126X_IRQ_RX_DONE) != 0) {
+        pwr_mode = lora::STDBY_RC;
 
+        if (((irq_status & SX126X_IRQ_CRC_ERROR) != 0) || ((irq_status & SX126X_IRQ_HEADER_ERROR) != 0)) {
+            WLB_LOG("Rx done, CRC fucked\n");
+        } else {
+            uint8_t buf[255] = {};
+            uint8_t pkt_len = 0;
+            if (!read_rx_buf(buf, sizeof(buf), &pkt_len)) {
+                WLB_LOG("Can't read a thing\n");
+            } else {
+                WLB_LOG("-- Rx done OK --\n");
+                WLB_LOG("Buf len: %u\n", pkt_len);
+                for (uint8_t idx = 0; idx < pkt_len; idx += 1) {
+                    WLB_LOG("0x%02x ", buf[idx]);
+                }
+                WLB_LOG("\n-- Rx done OK --\n");
+            }
+        }
+    }
+
+    if ((irq_status & SX126X_IRQ_TX_DONE) != 0) {
+        pwr_mode = lora::STDBY_RC;
+        WLB_LOG("Tx Done!\n");
+    }
+
+    if ((irq_status & SX126X_IRQ_TIMEOUT) != 0) {
+        pwr_mode = lora::STDBY_RC;
+        WLB_LOG("Timeout??\n");
     }
 }
 
 bool subghz::set_lora_tx(uint8_t *buf, uint8_t len, int8_t tx_power, uint32_t timeout_ms, uint16_t preamble_cnt, bool header_en, bool crc_on, bool invert_iq)
 {
+    if (buf == nullptr || len < 1) {
+        return false;
+    }
+
     auto ret = SX126X_STATUS_OK;
     auto tx_pwr_level = (int8_t)(tx_power > 14 ? tx_power : 14);
     for (uint32_t idx = 0; idx < (sizeof(pa_cfg_lut) / sizeof(lora::pa_cfg_lut_item)); idx += 1) {
@@ -99,13 +132,55 @@ bool subghz::set_lora_tx(uint8_t *buf, uint8_t len, int8_t tx_power, uint32_t ti
     pkt_params.pld_len_in_bytes = len;
     ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_lora_pkt_params(nullptr, &pkt_params));
 
-    uint16_t dio_masks = SX126X_IRQ_TX_DONE | SX126X_IRQ_CRC_ERROR | SX126X_IRQ_HEADER_ERROR | SX126X_IRQ_TIMEOUT;
+    uint16_t dio_masks = SX126X_IRQ_TX_DONE | SX126X_IRQ_TIMEOUT;
     ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_dio_irq_params(nullptr, dio_masks, dio_masks, 0, 0));
 
     ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_write_buffer(nullptr, 0, buf, len));
 
     ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_tx(nullptr, timeout_ms));
     pwr_mode = lora::TX;
+    return ret == SX126X_STATUS_OK;
+}
+
+bool subghz::set_lora_rx(uint8_t len, uint32_t timeout_ms, uint16_t preamble_cnt, bool rx_boost, bool header_en, bool crc_on, bool invert_iq)
+{
+    sx126x_pkt_params_lora_t pkt_params = {};
+    pkt_params.crc_is_on = crc_on;
+    pkt_params.invert_iq_is_on = invert_iq;
+    pkt_params.header_type = header_en ? SX126X_LORA_PKT_EXPLICIT : SX126X_LORA_PKT_IMPLICIT;
+    pkt_params.preamble_len_in_symb = preamble_cnt;
+    pkt_params.pld_len_in_bytes = len;
+    auto ret = sx126x_set_lora_pkt_params(nullptr, &pkt_params);
+
+    uint16_t dio_masks = SX126X_IRQ_RX_DONE | SX126X_IRQ_TIMEOUT;
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_dio_irq_params(nullptr, dio_masks, dio_masks, 0, 0));
+
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_cfg_rx_boosted(nullptr, rx_boost));
+
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_rx(nullptr, timeout_ms));
+    pwr_mode = lora::RX;
+    return ret == SX126X_STATUS_OK;
+}
+
+bool subghz::read_rx_buf(uint8_t *buf, uint8_t len, uint8_t *actual_len)
+{
+    if (buf == nullptr || len < 1) {
+        return false;
+    }
+
+    sx126x_rx_buffer_status_t buf_status = {};
+    auto ret = sx126x_get_rx_buffer_status(nullptr, &buf_status);
+    if (ret != SX126X_STATUS_OK) {
+        return false;
+    }
+
+    if (actual_len != nullptr) {
+        *actual_len = buf_status.pld_len_in_bytes;
+    }
+
+    uint8_t read_len = std::min(len, buf_status.pld_len_in_bytes);
+    ret = sx126x_read_buffer(nullptr, buf_status.buffer_start_pointer, buf, read_len);
+
     return ret == SX126X_STATUS_OK;
 }
 
