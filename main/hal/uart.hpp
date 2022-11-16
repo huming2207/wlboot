@@ -3,6 +3,12 @@
 #include <cstdint>
 #include <cstddef>
 
+class uart_rx_notifiable
+{
+public:
+    virtual bool on_pkt_received() = 0;
+};
+
 class uart
 {
 public:
@@ -13,5 +19,7 @@ public:
     virtual size_t get_rx_buf_len() = 0;
     virtual void set_tx(bool enable) = 0;
     virtual void set_rx(bool enable) = 0;
+    virtual void set_rx_notify_byte(uint8_t byte, uart_rx_notifiable *handler) = 0;
     virtual void handle_task() = 0;
 };
+

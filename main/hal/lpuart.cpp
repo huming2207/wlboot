@@ -102,6 +102,12 @@ void lpuart::handle_task()
         auto *acq_buf = rx_buf.WriteAcquire(1);
         *acq_buf = byte_recved;
         rx_buf.WriteRelease(1);
+
+        if (rx_notify_handler != nullptr) {
+            if (recv_byte == rx_notify_byte) {
+                rx_notify_handler->on_pkt_received();
+            }
+        }
     }
 }
 
@@ -134,6 +140,12 @@ size_t lpuart::get_rx_buf_len()
     rx_buf.ReadRelease(0);
 
     return ret.second;
+}
+
+void lpuart::set_rx_notify_byte(uint8_t byte, uart_rx_notifiable *handler)
+{
+    rx_notify_byte = byte;
+    rx_notify_handler = handler;
 }
 
 extern "C" void LPUART1_IRQHandler()

@@ -23,6 +23,7 @@ public:
     void set_tx(bool enable) override;
     void set_rx(bool enable) override;
     size_t get_rx_buf_len() override;
+    void set_rx_notify_byte(uint8_t byte, uart_rx_notifiable *handler) override;
     void handle_task() override; // In main loop
 
 public:
@@ -35,4 +36,6 @@ public:
 private:
     static LfBb<uint8_t, 1024> rx_buf;
     lpuart() = default;
+    uint8_t rx_notify_byte = 0xff;
+    uart_rx_notifiable *rx_notify_handler = nullptr;
 };
