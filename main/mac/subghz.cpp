@@ -92,7 +92,10 @@ void subghz::handle_task()
                 for (uint8_t idx = 0; idx < pkt_len; idx += 1) {
                     WLB_LOG("0x%02x ", buf[idx]);
                 }
-                WLB_LOG("\n-- Rx done OK --\n");
+
+                sx126x_pkt_status_lora_t pkt_status = {};
+                sx126x_get_lora_pkt_status(nullptr, &pkt_status);
+                WLB_LOG("\n-- PktRssi %d; SigRssi %d; SNR %d --\n", pkt_status.rssi_pkt_in_dbm, pkt_status.signal_rssi_pkt_in_dbm, pkt_status.snr_pkt_in_db);
             }
         }
     }

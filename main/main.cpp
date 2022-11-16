@@ -2,6 +2,7 @@
 #include "stm32wlxx_hal.h"
 #include "stm32wlxx_ll_utils.h"
 #include "subghz.hpp"
+#include "log.h"
 
 #include <lpuart.hpp>
 
@@ -67,9 +68,24 @@ int main()
     uart->init();
     lora->init();
 
+    if (!lora->setup_lora(918000000, SX126X_LORA_SF7, SX126X_LORA_BW_125, false)) {
+        WLB_LOG("LoRa mode init failed");
+    }
+
+    uint8_t buf[8] = { 0xca, 0xfe, 0xbe, 0xef, 0x5a, 0xa5, 0xaa, 0x55 };
+//    while (true) {
+//        uart->handle_task();
+//        lora->handle_task();
+//        lora->set_lora_tx(buf, sizeof(buf), 20, 1000, 20, true);
+//        LL_mDelay(300);
+//    }
+
+    uint8_t rx_buf[8] = {};
     while (true) {
         uart->handle_task();
         lora->handle_task();
+        lora->set_lora_rx(sizeof(rx_buf), 1000, 20, true, true);
+        LL_mDelay(1000);
     }
 }
 
