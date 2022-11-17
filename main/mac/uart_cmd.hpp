@@ -3,6 +3,73 @@
 #include <uart.hpp>
 #include "lpuart.hpp"
 
+namespace cmd_def
+{
+    static constexpr const uint32_t DEFAULT_FW_VER = 1000;
+    enum uart_opcode : uint8_t
+    {
+        UART_OP_ACK = 0x00,
+        UART_OP_NACK = 0xff,
+        UART_OP_PING = 0x01, // From host
+        UART_OP_PONG = 0x02, // To host
+        UART_OP_LORA_CFG = 0x03,
+        UART_OP_LORA_ADV_CFG = 0x04,
+        UART_OP_RESET_RADIO = 0x05,
+        UART_OP_SEND_PKT = 0x10, // From host -> SUBGHZ -> Air
+        UART_OP_RECV_PKT = 0x11, // To host
+    };
+
+    struct __attribute__((packed)) uart_pkt_header
+    {
+        uart_opcode opcode;
+        uint16_t crc;
+        uint64_t mac;
+    };
+
+    struct __attribute__((packed)) uart_ping_pkt
+    {
+        uint32_t ts;
+    };
+
+    struct __attribute__((packed)) uart_pong_pkt
+    {
+        uint32_t fw_ver;
+        uint64_t mac;
+        uint8_t uid[12];
+    };
+
+    struct __attribute__((packed)) uart_lora_cfg_pkt
+    {
+        uint8_t sf;
+        uint8_t bw;
+        uint8_t cr;
+        uint8_t ldro;
+        uint8_t sync_word;
+        uint32_t freq_hz;
+    };
+
+    struct __attribute__((packed)) uart_tx_pkt
+    {
+        uint8_t tx_pwr;
+        uint32_t timeout_ms;
+        uint16_t preamble_cnt;
+        uint8_t header_en;
+        uint8_t crc_on;
+        uint8_t invert_iq;
+        uint8_t len;
+        uint8_t buf[255];
+    };
+
+    struct __attribute__((packed)) uart_rx_pkt
+    {
+        uint8_t pkt_rssi;
+        uint8_t sig_rssi;
+        uint8_t snr;
+        uint8_t len;
+        uint8_t buf[255];
+    };
+}
+
 class uart_cmd final : public uart_rx_notifiable
 {
 public:
