@@ -11,7 +11,7 @@ namespace cmd_def
         UART_OP_ACK = 0x00,
         UART_OP_NACK = 0xff,
         UART_OP_PING = 0x01, // From host
-        UART_OP_PONG = 0x02, // To host
+        UART_OP_DEVICE_INFO = 0x02, // To host
         UART_OP_LORA_CFG = 0x03,
         UART_OP_LORA_ADV_CFG = 0x04,
         UART_OP_RESET_RADIO = 0x05,
@@ -83,16 +83,22 @@ public:
     void operator=(uart_cmd const &) = delete;
 
 public:
+    bool init();
     bool on_pkt_received() override;
+    void send_ack_pkt();
+    void send_nack_pkt();
 
 private:
     uart_cmd() = default;
+    static uint64_t get_mac();
+    static uint16_t crc_16(uint8_t *buf, size_t len, uint16_t poly = 0);
 
 private:
     volatile bool decode_started = false;
     size_t decoded_len = 0;
     lpuart *uart = lpuart::instance();
-    uint8_t decoded_buf[1024] = {};
+    uint64_t mac_addr = 0;
+    static uint8_t decoded_buf[1024];
 
     static const constexpr uint8_t SSLIP_START = 0xa5;
     static const constexpr uint8_t SSLIP_END = 0xc0;
@@ -100,5 +106,6 @@ private:
     static const constexpr uint8_t SSLIP_ESC_END = 0xdc;
     static const constexpr uint8_t SSLIP_ESC_ESC = 0xdd;
     static const constexpr uint8_t SSLIP_ESC_START = 0xde;
+    static const constexpr uint16_t CRC_POLY = 0x1021;
 };
 
