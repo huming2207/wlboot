@@ -15,8 +15,8 @@ namespace cmd_def
         UART_OP_LORA_CFG = 0x03,
         UART_OP_LORA_ADV_CFG = 0x04,
         UART_OP_RESET_RADIO = 0x05,
-        UART_OP_SEND_PKT = 0x10, // From host -> SUBGHZ -> Air
-        UART_OP_RECV_PKT = 0x11, // To host
+        UART_OP_SEND_LORA_PKT = 0x10, // From host -> SUBGHZ -> Air
+        UART_OP_RECV_LORA_PKT = 0x11, // To host
     };
 
     struct __attribute__((packed)) uart_pkt_header
@@ -85,13 +85,14 @@ public:
 public:
     bool init();
     bool on_pkt_received() override;
+    bool handle_pkt();
     void send_ack_pkt();
     void send_nack_pkt();
 
 private:
     uart_cmd() = default;
     static uint64_t get_mac();
-    static uint16_t crc_16(uint8_t *buf, size_t len, uint16_t poly = 0);
+    static uint16_t crc_16(uint8_t *buf, size_t len, uint16_t init = 0, uint16_t poly = 0x1021);
 
 private:
     volatile bool decode_started = false;

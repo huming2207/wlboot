@@ -2,6 +2,7 @@
 #include <stm32wlxx_ll_crc.h>
 #include <stm32wlxx_ll_utils.h>
 #include "uart_cmd.hpp"
+#include "log.h"
 
 bool uart_cmd::init()
 {
@@ -33,6 +34,7 @@ bool uart_cmd::on_pkt_received()
             }
 
             case SSLIP_END: {
+                handle_pkt();
                 break; // Handle end of receive
             }
 
@@ -80,6 +82,52 @@ bool uart_cmd::on_pkt_received()
     return false;
 }
 
+bool uart_cmd::handle_pkt()
+{
+    auto *header = (cmd_def::uart_pkt_header *)(decoded_buf);
+    uint16_t origin_crc = header->crc;
+    header->crc = 0;
+    uint16_t actual_crc = crc_16(decoded_buf, decoded_len);
+
+    if (origin_crc != actual_crc) {
+        WLB_LOG("CRC mismatched: 0x%04x vs 0x%04x", origin_crc, actual_crc);
+        send_nack_pkt();
+        return false;
+    }
+
+    switch (header->opcode) {
+        case cmd_def::UART_OP_PING: {
+            send_ack_pkt();
+            break;
+        }
+
+        case cmd_def::UART_OP_DEVICE_INFO: {
+            break;
+        }
+
+        case cmd_def::UART_OP_LORA_CFG: {
+            break;
+        }
+
+        case cmd_def::UART_OP_SEND_LORA_PKT: {
+            break;
+        }
+
+        case cmd_def::UART_OP_RESET_RADIO: {
+            break;
+        }
+
+        default: {
+            WLB_LOG("Unknown opcode: 0x%02x", header->opcode);
+            send_nack_pkt();
+            break;
+        }
+    }
+
+    return true;
+}
+
+
 void uart_cmd::send_ack_pkt()
 {
     cmd_def::uart_pkt_header header = {};
@@ -89,11 +137,21 @@ void uart_cmd::send_ack_pkt()
 
     uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
     header.crc = actual_crc;
+
+    uart->transmit((uint8_t *)&header, sizeof(header));
 }
 
 void uart_cmd::send_nack_pkt()
 {
+    cmd_def::uart_pkt_header header = {};
+    header.opcode = cmd_def::UART_OP_NACK;
+    header.mac = mac_addr;
+    header.crc = 0;
 
+    uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
+    header.crc = actual_crc;
+
+    uart->transmit((uint8_t *)&header, sizeof(header));
 }
 
 uint64_t uart_cmd::get_mac()
@@ -103,11 +161,13 @@ uint64_t uart_cmd::get_mac()
     return (uint64_t)(((uint64_t)dev_id << 32u) | maker_id);
 }
 
-uint16_t uart_cmd::crc_16(uint8_t *buf, size_t len, uint16_t poly)
+uint16_t uart_cmd::crc_16(uint8_t *buf, size_t len, uint16_t init, uint16_t poly)
 {
     size_t idx = 0;
     LL_CRC_ResetCRCCalculationUnit(CRC);
-    LL_CRC_SetInitialData(CRC, poly);
+    LL_CRC_SetPolynomialSize(CRC, LL_CRC_POLYLENGTH_16B);
+    LL_CRC_SetPolynomialCoef(CRC, poly);
+    LL_CRC_SetInitialData(CRC, init);
 
     for (idx = 0; idx < (len / 4); idx += 1) {
         auto data = (uint32_t)((uint32_t)(buf[idx] << 24) | (uint32_t)(buf[idx] << 16) | (uint32_t)(buf[idx] << 8) | (uint32_t)(buf[idx]));
