@@ -31,7 +31,7 @@ namespace cmd_def
         uint32_t ts;
     };
 
-    struct __attribute__((packed)) uart_pong_pkt
+    struct __attribute__((packed)) uart_dev_info_pkt
     {
         uint32_t fw_ver;
         uint64_t mac;
@@ -86,8 +86,10 @@ public:
     bool init();
     bool on_pkt_received() override;
     bool handle_pkt();
+    void encode_sslip_and_tx(cmd_def::uart_pkt_header *header, uint8_t *data, size_t len);
     void send_ack_pkt();
     void send_nack_pkt();
+    void send_device_info();
 
 private:
     uart_cmd() = default;

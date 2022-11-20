@@ -3,6 +3,7 @@
 #include <stm32wlxx_ll_utils.h>
 #include "uart_cmd.hpp"
 #include "log.h"
+#include "../misc.hpp"
 
 bool uart_cmd::init()
 {
@@ -11,8 +12,6 @@ bool uart_cmd::init()
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_CRC);
     LL_CRC_SetInputDataReverseMode(CRC, LL_CRC_INDATA_REVERSE_NONE);
     LL_CRC_SetOutputDataReverseMode(CRC, LL_CRC_OUTDATA_REVERSE_NONE);
-    LL_CRC_SetPolynomialSize(CRC, LL_CRC_POLYLENGTH_16B);
-    LL_CRC_SetPolynomialCoef(CRC, CRC_POLY);
     LL_CRC_SetInitialData(CRC, 0);
 
     return true;
@@ -82,6 +81,72 @@ bool uart_cmd::on_pkt_received()
     return false;
 }
 
+void uart_cmd::encode_sslip_and_tx(cmd_def::uart_pkt_header *header, uint8_t *data, size_t len)
+{
+    const uint8_t esc_start[] = { SSLIP_ESC, SSLIP_ESC_START };
+    const uint8_t esc_end[] = { SSLIP_ESC, SSLIP_ESC_END };
+    const uint8_t esc_esc[] = { SSLIP_ESC, SSLIP_ESC_ESC };
+
+    if (header == nullptr) {
+        return;
+    }
+
+    auto *header_buf = (uint8_t *)header;
+
+    uart->transmit((uint8_t *)&SSLIP_START, 1);
+    for (size_t idx = 0; idx < sizeof(cmd_def::uart_pkt_header); idx += 1) {
+        switch (header_buf[idx]) {
+            case SSLIP_ESC: {
+                uart->transmit((uint8_t *)(esc_esc), sizeof(esc_esc));
+                break;
+            }
+
+            case SSLIP_START: {
+                uart->transmit((uint8_t *)(esc_start), sizeof(esc_start));
+                break;
+            }
+
+            case SSLIP_END: {
+                uart->transmit((uint8_t *)(esc_end), sizeof(esc_end));
+                break;
+            }
+
+            default: {
+                uart->transmit(&data[idx], 1);
+                break;
+            }
+        }
+    }
+
+    if (data != nullptr && len > 0) {
+        for (size_t idx = 0; idx < len; idx += 1) {
+            switch (data[idx]) {
+                case SSLIP_ESC: {
+                    uart->transmit((uint8_t *)(esc_esc), sizeof(esc_esc));
+                    break;
+                }
+
+                case SSLIP_START: {
+                    uart->transmit((uint8_t *)(esc_start), sizeof(esc_start));
+                    break;
+                }
+
+                case SSLIP_END: {
+                    uart->transmit((uint8_t *)(esc_end), sizeof(esc_end));
+                    break;
+                }
+
+                default: {
+                    uart->transmit(&data[idx], 1);
+                    break;
+                }
+            }
+        }
+    }
+
+    uart->transmit((uint8_t *)&SSLIP_END, 1);
+}
+
 bool uart_cmd::handle_pkt()
 {
     auto *header = (cmd_def::uart_pkt_header *)(decoded_buf);
@@ -102,6 +167,7 @@ bool uart_cmd::handle_pkt()
         }
 
         case cmd_def::UART_OP_DEVICE_INFO: {
+            send_device_info();
             break;
         }
 
@@ -138,7 +204,7 @@ void uart_cmd::send_ack_pkt()
     uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
     header.crc = actual_crc;
 
-    uart->transmit((uint8_t *)&header, sizeof(header));
+    encode_sslip_and_tx(&header, nullptr, 0);
 }
 
 void uart_cmd::send_nack_pkt()
@@ -151,7 +217,35 @@ void uart_cmd::send_nack_pkt()
     uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
     header.crc = actual_crc;
 
-    uart->transmit((uint8_t *)&header, sizeof(header));
+    encode_sslip_and_tx(&header, nullptr, 0);
+}
+
+void uart_cmd::send_device_info()
+{
+    cmd_def::uart_pkt_header header = {};
+    header.opcode = cmd_def::UART_OP_DEVICE_INFO;
+    header.mac = mac_addr;
+    header.crc = 0;
+
+    uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
+
+    cmd_def::uart_dev_info_pkt pkt = {};
+    pkt.mac = mac_addr;
+
+    uint32_t uid0 = LL_GetUID_Word0();
+    uint32_t uid1 = LL_GetUID_Word1();
+    uint32_t uid2 = LL_GetUID_Word2();
+
+    memcpy(&pkt.uid[0], &uid0, sizeof(uint32_t));
+    memcpy(&pkt.uid[4], &uid1, sizeof(uint32_t));
+    memcpy(&pkt.uid[8], &uid2, sizeof(uint32_t));
+
+    pkt.fw_ver = WLB_FW_VER;
+
+    actual_crc = crc_16((uint8_t *)&header, sizeof(header), actual_crc);
+    header.crc = actual_crc;
+
+    encode_sslip_and_tx(&header, (uint8_t *)&pkt, sizeof(pkt));
 }
 
 uint64_t uart_cmd::get_mac()
