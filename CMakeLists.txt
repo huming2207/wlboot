@@ -25,7 +25,7 @@ add_executable(
             "main/stm32wlxx_hal_conf.h" "main/stm32wlxx_it.c" "main/stm32wlxx_it.h"
             "main/startup_stm32wle5xx.s" "main/system_stm32wlxx.c"
             ${STM32_HAL_SRC} ${SX126X_HAL_SRC}
-            "main/main.cpp"
+            "main/main.cpp" "main/misc.hpp"
             "external/logging/log.c" "external/logging/log.h"
             "main/hal/uart.hpp"
             "main/hal/lpuart.cpp" "main/hal/lpuart.hpp"
