@@ -2,6 +2,7 @@
 
 #include <uart.hpp>
 #include "lpuart.hpp"
+#include "subghz.hpp"
 
 namespace cmd_def
 {
@@ -50,7 +51,7 @@ namespace cmd_def
 
     struct __attribute__((packed)) uart_tx_pkt
     {
-        uint8_t tx_pwr;
+        int8_t tx_pwr;
         uint32_t timeout_ms;
         uint16_t preamble_cnt;
         uint8_t header_en;
@@ -86,6 +87,8 @@ public:
     bool init();
     bool on_pkt_received() override;
     bool handle_pkt();
+    bool handle_lora_cfg(void *offset, size_t len);
+    bool handle_lora_tx(void *offset, size_t len);
     void encode_sslip_and_tx(cmd_def::uart_pkt_header *header, uint8_t *data, size_t len);
     void send_ack_pkt();
     void send_nack_pkt();
@@ -100,6 +103,7 @@ private:
     volatile bool decode_started = false;
     size_t decoded_len = 0;
     lpuart *uart = lpuart::instance();
+    subghz *lora = subghz::instance();
     uint64_t mac_addr = 0;
     static uint8_t decoded_buf[1024];
 
