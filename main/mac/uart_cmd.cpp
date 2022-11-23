@@ -1,6 +1,7 @@
 #include <cstring>
 #include <stm32wlxx_ll_crc.h>
 #include <stm32wlxx_ll_utils.h>
+#include "stm32wlxx_ll_bus.h"
 #include "uart_cmd.hpp"
 #include "log.h"
 #include "../misc.hpp"

@@ -9,8 +9,8 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(CMAKE_OBJCOPY "arm-none-eabi-objcopy")
 
 file(GLOB_RECURSE STM32_HAL_SRC
-        "external/driver/Src/*.c"
-        "external/driver/Inc/*.h"
+        "external/driver/Src/stm32wlxx_ll*.c"
+        "external/driver/Inc/stm32wlxx_ll*.h"
 )
 
 file(GLOB_RECURSE SX126X_HAL_SRC
@@ -22,7 +22,7 @@ project(wlboot C CXX ASM)
 
 add_executable(
         wlboot
-            "main/stm32wlxx_hal_conf.h" "main/stm32wlxx_it.c" "main/stm32wlxx_it.h"
+            "main/stm32wlxx_it.c" "main/stm32wlxx_it.h"
             "main/startup_stm32wle5xx.s" "main/system_stm32wlxx.c"
             ${STM32_HAL_SRC} ${SX126X_HAL_SRC}
             "main/main.cpp" "main/misc.hpp"
@@ -61,7 +61,6 @@ if (CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
             CORE_CM4=1
             STM32WLE5xx=1
             USE_FULL_LL_DRIVER=1
-            USE_HAL_DRIVER=1
     )
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
     message("Build in Release with no log mode")
@@ -82,7 +81,6 @@ elseif(CMAKE_BUILD_TYPE MATCHES Release)
             CORE_CM4=1
             STM32WLE5xx=1
             USE_FULL_LL_DRIVER=1
-            USE_HAL_DRIVER=1
             DISABLE_LOG=1
     )
 else()
@@ -107,7 +105,6 @@ else()
             CORE_CM4=1
             STM32WLE5xx=1
             USE_FULL_LL_DRIVER=1
-            USE_HAL_DRIVER=1
     )
 endif()
 

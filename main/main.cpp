@@ -1,8 +1,11 @@
 #include <cstdio>
-#include "stm32wlxx_hal.h"
 #include "stm32wlxx_ll_utils.h"
 #include "subghz.hpp"
 #include "log.h"
+#include "stm32wlxx_ll_pwr.h"
+#include "stm32wlxx_ll_system.h"
+#include "stm32wlxx_ll_rcc.h"
+#include "stm32wlxx_ll_bus.h"
 
 #include <lpuart.hpp>
 
@@ -50,6 +53,9 @@ static void SystemClock_Config()
     LL_RCC_SetAHB3Prescaler(LL_RCC_SYSCLK_DIV_1);
     LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
     LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
+
+    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_CRC);
+
     /* Update CMSIS variable (which can be updated also through SystemCoreClockUpdate function) */
     LL_SetSystemCoreClock(48000000);
     LL_Init1msTick(48000000);
@@ -73,12 +79,12 @@ int main()
     }
 
     uint8_t buf[8] = { 0xca, 0xfe, 0xbe, 0xef, 0x5a, 0xa5, 0xaa, 0x55 };
-//    while (true) {
-//        uart->handle_task();
-//        lora->handle_task();
-//        lora->set_lora_tx(buf, sizeof(buf), 20, 1000, 20, true);
-//        LL_mDelay(300);
-//    }
+    while (true) {
+        uart->handle_task();
+        lora->handle_task();
+        lora->set_lora_tx(buf, sizeof(buf), 20, 1000, 20, true);
+        LL_mDelay(300);
+    }
 
     uint8_t rx_buf[8] = {};
     while (true) {

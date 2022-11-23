@@ -1,7 +1,12 @@
 #include <stm32wlxx_ll_utils.h>
 #include <stm32wlxx_ll_pwr.h>
+#include <stddef.h>
 
+#include "sx126x.h"
 #include "stm32wl_subghz_hal.h"
+#include "stm32wlxx_ll_exti.h"
+#include "stm32wlxx_ll_bus.h"
+#include "stm32wlxx_ll_rcc.h"
 
 // Some weird loop cycles definition from ST
 #define SUBGHZ_DEFAULT_LOOP_TIME   ((SystemCoreClock*28U)>>19U)
@@ -18,6 +23,8 @@
 #define SUBGHZSPI_BAUDRATEPRESCALER_64      (SPI_CR1_BR_2 | SPI_CR1_BR_0)
 #define SUBGHZSPI_BAUDRATEPRESCALER_128     (SPI_CR1_BR_2 | SPI_CR1_BR_1)
 #define SUBGHZSPI_BAUDRATEPRESCALER_256     (SPI_CR1_BR_2 | SPI_CR1_BR_1 | SPI_CR1_BR_0)
+
+#define SX126X_CMD_SET_SLEEP 0x84
 
 static bool subghz_spi_send_byte(uint8_t data)
 {
@@ -120,7 +127,7 @@ sx126x_hal_status_t sx126x_hal_write(const void *context, const uint8_t *command
     }
 
     // Wait if busy
-    if (command[0] != RADIO_SET_SLEEP) {
+    if (command[0] != SX126X_CMD_SET_SLEEP) {
         if (!subghz_wait_on_busy()) {
             LL_PWR_UnselectSUBGHZSPI_NSS();
             if (!primask) {
@@ -149,7 +156,7 @@ sx126x_hal_status_t sx126x_hal_write(const void *context, const uint8_t *command
     LL_PWR_UnselectSUBGHZSPI_NSS();
 
     // Wait if busy
-    if (command[0] != RADIO_SET_SLEEP) {
+    if (command[0] != SX126X_CMD_SET_SLEEP) {
         if (!subghz_wait_on_busy()) {
             if (!primask) {
                 __enable_irq();
@@ -187,7 +194,7 @@ sx126x_hal_status_t sx126x_hal_read(const void *context, const uint8_t *command,
     }
 
     // Wait if busy
-    if (command[0] != RADIO_SET_SLEEP) {
+    if (command[0] != SX126X_CMD_SET_SLEEP) {
         if (!subghz_wait_on_busy()) {
             LL_PWR_UnselectSUBGHZSPI_NSS();
             if (!primask) {
