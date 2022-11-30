@@ -24,7 +24,6 @@ namespace cmd_def
     {
         uart_opcode opcode;
         uint16_t crc;
-        uint64_t mac;
     };
 
     struct __attribute__((packed)) uart_ping_pkt

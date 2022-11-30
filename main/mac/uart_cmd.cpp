@@ -242,7 +242,6 @@ void uart_cmd::send_ack_pkt()
 {
     cmd_def::uart_pkt_header header = {};
     header.opcode = cmd_def::UART_OP_ACK;
-    header.mac = mac_addr;
     header.crc = 0;
 
     uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
@@ -255,7 +254,6 @@ void uart_cmd::send_nack_pkt()
 {
     cmd_def::uart_pkt_header header = {};
     header.opcode = cmd_def::UART_OP_NACK;
-    header.mac = mac_addr;
     header.crc = 0;
 
     uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
@@ -268,7 +266,6 @@ void uart_cmd::send_device_info()
 {
     cmd_def::uart_pkt_header header = {};
     header.opcode = cmd_def::UART_OP_DEVICE_INFO;
-    header.mac = mac_addr;
     header.crc = 0;
 
     uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
