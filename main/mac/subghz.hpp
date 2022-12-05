@@ -22,6 +22,16 @@ namespace lora
     };
 }
 
+class subghz_irq_notifiable
+{
+public:
+    virtual void on_subghz_tx_done() = 0;
+    virtual void on_subghz_rx_done() = 0;
+    virtual void on_subghz_timeout() = 0;
+    virtual void on_subghz_crc_error() = 0;
+    virtual void on_subghz_header_error() = 0;
+};
+
 class subghz
 {
 public:
@@ -44,10 +54,13 @@ public:
     bool set_lora_tx(uint8_t *buf, uint8_t len, int8_t tx_power, uint32_t timeout_ms, uint16_t preamble_cnt, bool header_en = true, bool crc_on = true, bool invert_iq = false);
     bool set_lora_rx(uint8_t len, uint32_t timeout_ms, uint16_t preamble_cnt, bool rx_boost = true, bool header_en = true, bool crc_on = true, bool invert_iq = false);
     bool read_rx_buf(uint8_t *buf, uint8_t len, uint8_t *actual_len);
+    void set_irq_handler(subghz_irq_notifiable *handler);
+    bool get_lora_pkt_status(sx126x_pkt_status_lora_t *status);
     void handle_task();
 
 public:
     volatile lora::pwr_mode pwr_mode = lora::SLEEP;
+    subghz_irq_notifiable *irq_handler = nullptr;
     static volatile sx126x_irq_mask_t last_irq_status;
     static const constexpr lora::pa_cfg_lut_item pa_cfg_lut[] =
     {

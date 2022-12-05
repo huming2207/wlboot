@@ -77,37 +77,39 @@ void subghz::handle_task()
     last_irq_status = 0;
 
     if ((irq_status & SX126X_IRQ_RX_DONE) != 0) {
+        if (irq_handler) {
+            irq_handler->on_subghz_rx_done();
+        }
+
         pwr_mode = lora::STDBY_RC;
 
         if (((irq_status & SX126X_IRQ_CRC_ERROR) != 0) || ((irq_status & SX126X_IRQ_HEADER_ERROR) != 0)) {
-            WLB_LOG("Rx done, CRC fucked\n");
-        } else {
-            uint8_t buf[255] = {};
-            uint8_t pkt_len = 0;
-            if (!read_rx_buf(buf, sizeof(buf), &pkt_len)) {
-                WLB_LOG("Can't read a thing\n");
-            } else {
-                WLB_LOG("-- Rx done OK --\n");
-                WLB_LOG("Buf len: %u\n", pkt_len);
-                for (uint8_t idx = 0; idx < pkt_len; idx += 1) {
-                    WLB_LOG("0x%02x ", buf[idx]);
-                }
-
-                sx126x_pkt_status_lora_t pkt_status = {};
-                sx126x_get_lora_pkt_status(nullptr, &pkt_status);
-                WLB_LOG("\n-- PktRssi %d; SigRssi %d; SNR %d --\n", pkt_status.rssi_pkt_in_dbm, pkt_status.signal_rssi_pkt_in_dbm, pkt_status.snr_pkt_in_db);
+            if ((irq_status & SX126X_IRQ_CRC_ERROR) != 0 && irq_handler != nullptr) {
+                irq_handler->on_subghz_crc_error();
             }
+
+            if ((irq_status & SX126X_IRQ_HEADER_ERROR) != 0 && irq_handler != nullptr) {
+                irq_handler->on_subghz_header_error();
+            }
+        } else if (irq_handler != nullptr) {
+            irq_handler->on_subghz_rx_done();
         }
     }
 
     if ((irq_status & SX126X_IRQ_TX_DONE) != 0) {
+        if (irq_handler) {
+            irq_handler->on_subghz_tx_done();
+        }
+
         pwr_mode = lora::STDBY_RC;
-        WLB_LOG("Tx Done!\n");
     }
 
     if ((irq_status & SX126X_IRQ_TIMEOUT) != 0) {
+        if (irq_handler) {
+            irq_handler->on_subghz_timeout();
+        }
+
         pwr_mode = lora::STDBY_RC;
-        WLB_LOG("Timeout??\n");
     }
 }
 
@@ -185,5 +187,21 @@ bool subghz::read_rx_buf(uint8_t *buf, uint8_t len, uint8_t *actual_len)
     ret = sx126x_read_buffer(nullptr, buf_status.buffer_start_pointer, buf, read_len);
 
     return ret == SX126X_STATUS_OK;
+}
+
+void subghz::set_irq_handler(subghz_irq_notifiable *handler)
+{
+    irq_handler = handler;
+}
+
+bool subghz::get_lora_pkt_status(sx126x_pkt_status_lora_t *status)
+{
+    if (status == nullptr) {
+        return false;
+    }
+
+    sx126x_get_lora_pkt_status(nullptr, status);
+
+    return true;
 }
 
