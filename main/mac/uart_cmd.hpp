@@ -18,11 +18,15 @@ namespace cmd_def
         UART_OP_RESET_RADIO = 0x05,
         UART_OP_SEND_LORA_PKT = 0x10, // From host -> SUBGHZ -> Air
         UART_OP_RECV_LORA_PKT = 0x11, // To host
+        UART_OP_RADIO_TIMEOUT = 0x12,
+        UART_OP_HEADER_ERROR = 0x13,
+        UART_OP_CRC_ERROR = 0x14,
     };
 
     struct __attribute__((packed)) uart_pkt_header
     {
         uart_opcode opcode;
+        uint8_t ctr;
         uint16_t crc;
     };
 
@@ -70,7 +74,7 @@ namespace cmd_def
     };
 }
 
-class uart_cmd final : public uart_rx_notifiable
+class uart_cmd final : private uart_rx_notifiable, private subghz_irq_notifiable
 {
 public:
     static uart_cmd *instance()
@@ -84,7 +88,6 @@ public:
 
 public:
     bool init();
-    bool on_pkt_received() override;
     bool handle_pkt();
     bool handle_lora_cfg(void *offset, size_t len);
     bool handle_lora_tx(void *offset, size_t len);
@@ -98,8 +101,17 @@ private:
     static uint64_t get_mac();
     static uint16_t crc_16(uint8_t *buf, size_t len, uint16_t init = 0, uint16_t poly = 0x1021);
 
+    bool on_uart_pkt_recv() override;
+    void on_subghz_tx_done() override;
+    void on_subghz_rx_done() override;
+    void on_subghz_timeout() override;
+    void on_subghz_crc_error() override;
+    void on_subghz_header_error() override;
+
 private:
     volatile bool decode_started = false;
+    volatile uint8_t curr_ctr = 0;
+
     size_t decoded_len = 0;
     lpuart *uart = lpuart::instance();
     subghz *lora = subghz::instance();

@@ -19,7 +19,7 @@ bool uart_cmd::init()
 }
 
 
-bool uart_cmd::on_pkt_received()
+bool uart_cmd::on_uart_pkt_recv()
 {
     size_t len = uart->get_rx_buf_len();
     while (len > 0) {
@@ -283,7 +283,7 @@ void uart_cmd::send_device_info()
 
     pkt.fw_ver = WLB_FW_VER;
 
-    actual_crc = crc_16((uint8_t *)&header, sizeof(header), actual_crc);
+    actual_crc = crc_16((uint8_t *)&pkt, sizeof(pkt), actual_crc);
     header.crc = actual_crc;
 
     encode_sslip_and_tx(&header, (uint8_t *)&pkt, sizeof(pkt));
@@ -325,4 +325,63 @@ uint16_t uart_cmd::crc_16(uint8_t *buf, size_t len, uint16_t init, uint16_t poly
     }
 
     return LL_CRC_ReadData16(CRC);
+}
+
+void uart_cmd::on_subghz_tx_done()
+{
+    cmd_def::uart_pkt_header header = {};
+    header.opcode = cmd_def::UART_OP_SEND_LORA_PKT;
+    header.crc = 0;
+
+    uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
+    header.crc = actual_crc;
+
+    encode_sslip_and_tx(&header, nullptr, 0);
+}
+
+void uart_cmd::on_subghz_rx_done()
+{
+    cmd_def::uart_pkt_header header = {};
+    header.opcode = cmd_def::UART_OP_RECV_LORA_PKT;
+    header.crc = 0;
+
+    uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
+    header.crc = actual_crc;
+
+    cmd_def::uart_rx_pkt pkt = {};
+    sx126x_pkt_status_lora_t pkt_status = {};
+
+    if (!lora->get_lora_pkt_status(&pkt_status)) {
+        // Send internal error here!
+        return;
+    }
+
+    pkt.pkt_rssi = (uint8_t)abs(pkt_status.rssi_pkt_in_dbm);
+    pkt.sig_rssi = (uint8_t)abs(pkt_status.signal_rssi_pkt_in_dbm);
+    pkt.snr = pkt_status.snr_pkt_in_db;
+
+    if (!lora->read_rx_buf(pkt.buf, sizeof(cmd_def::uart_rx_pkt::buf), &pkt.len)) {
+        // Send internal error here!
+        return;
+    }
+
+    actual_crc = crc_16((uint8_t *)&pkt, sizeof(pkt), actual_crc);
+    header.crc = actual_crc;
+
+    encode_sslip_and_tx(&header, nullptr, 0);
+}
+
+void uart_cmd::on_subghz_timeout()
+{
+
+}
+
+void uart_cmd::on_subghz_crc_error()
+{
+
+}
+
+void uart_cmd::on_subghz_header_error()
+{
+
 }
