@@ -6,7 +6,7 @@
 class uart_rx_notifiable
 {
 public:
-    virtual bool on_pkt_received() = 0;
+    virtual bool on_uart_pkt_recv() = 0;
 };
 
 class uart
