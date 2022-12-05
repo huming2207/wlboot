@@ -105,7 +105,7 @@ void lpuart::handle_task()
 
         if (rx_notify_handler != nullptr) {
             if (recv_byte == rx_notify_byte) {
-                rx_notify_handler->on_pkt_received();
+                rx_notify_handler->on_uart_pkt_recv();
             }
         }
     }
