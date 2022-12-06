@@ -352,7 +352,13 @@ void uart_cmd::on_subghz_rx_done()
     sx126x_pkt_status_lora_t pkt_status = {};
 
     if (!lora->get_lora_pkt_status(&pkt_status)) {
-        // Send internal error here!
+        header.opcode = cmd_def::UART_OP_ERR_INTERNAL;
+        header.crc = 0;
+
+        actual_crc = crc_16((uint8_t *)&header, sizeof(header));
+        header.crc = actual_crc;
+
+        encode_sslip_and_tx(&header, nullptr, 0);
         return;
     }
 
@@ -361,7 +367,13 @@ void uart_cmd::on_subghz_rx_done()
     pkt.snr = pkt_status.snr_pkt_in_db;
 
     if (!lora->read_rx_buf(pkt.buf, sizeof(cmd_def::uart_rx_pkt::buf), &pkt.len)) {
-        // Send internal error here!
+        header.opcode = cmd_def::UART_OP_ERR_INTERNAL;
+        header.crc = 0;
+
+        actual_crc = crc_16((uint8_t *)&header, sizeof(header));
+        header.crc = actual_crc;
+
+        encode_sslip_and_tx(&header, nullptr, 0);
         return;
     }
 
@@ -373,15 +385,36 @@ void uart_cmd::on_subghz_rx_done()
 
 void uart_cmd::on_subghz_timeout()
 {
+    cmd_def::uart_pkt_header header = {};
+    header.opcode = cmd_def::UART_OP_RADIO_TIMEOUT;
+    header.crc = 0;
 
+    uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
+    header.crc = actual_crc;
+
+    encode_sslip_and_tx(&header, nullptr, 0);
 }
 
 void uart_cmd::on_subghz_crc_error()
 {
+    cmd_def::uart_pkt_header header = {};
+    header.opcode = cmd_def::UART_OP_RADIO_CRC_ERROR;
+    header.crc = 0;
 
+    uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
+    header.crc = actual_crc;
+
+    encode_sslip_and_tx(&header, nullptr, 0);
 }
 
 void uart_cmd::on_subghz_header_error()
 {
+    cmd_def::uart_pkt_header header = {};
+    header.opcode = cmd_def::UART_OP_RADIO_HEADER_ERROR;
+    header.crc = 0;
 
+    uint16_t actual_crc = crc_16((uint8_t *)&header, sizeof(header));
+    header.crc = actual_crc;
+
+    encode_sslip_and_tx(&header, nullptr, 0);
 }

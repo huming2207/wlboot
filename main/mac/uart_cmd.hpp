@@ -10,17 +10,24 @@ namespace cmd_def
     enum uart_opcode : uint8_t
     {
         UART_OP_ACK = 0x00,
+
+        // Error
+        UART_OP_RADIO_TIMEOUT = 0xe0,
+        UART_OP_RADIO_HEADER_ERROR = 0xe1,
+        UART_OP_RADIO_CRC_ERROR = 0xe2,
         UART_OP_NACK = 0xff,
+        UART_OP_ERR_INTERNAL = 0xfe,
+
+        // Device setup
         UART_OP_PING = 0x01, // From host
         UART_OP_DEVICE_INFO = 0x02, // To host
         UART_OP_LORA_CFG = 0x03,
         UART_OP_LORA_ADV_CFG = 0x04,
         UART_OP_RESET_RADIO = 0x05,
+
+        // LoRa stuff
         UART_OP_SEND_LORA_PKT = 0x10, // From host -> SUBGHZ -> Air
         UART_OP_RECV_LORA_PKT = 0x11, // To host
-        UART_OP_RADIO_TIMEOUT = 0x12,
-        UART_OP_HEADER_ERROR = 0x13,
-        UART_OP_CRC_ERROR = 0x14,
     };
 
     struct __attribute__((packed)) uart_pkt_header
@@ -124,6 +131,5 @@ private:
     static const constexpr uint8_t SSLIP_ESC_END = 0xdc;
     static const constexpr uint8_t SSLIP_ESC_ESC = 0xdd;
     static const constexpr uint8_t SSLIP_ESC_START = 0xde;
-    static const constexpr uint16_t CRC_POLY = 0x1021;
 };
 
