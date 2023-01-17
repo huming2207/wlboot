@@ -111,6 +111,7 @@ SECTIONS
     _sdata = .;        /* create a global symbol at data start */
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
+    *(.code_in_ram)    /* functions in RAM */
 
     . = ALIGN(8);
     _edata = .;        /* define a global symbol at data end */
