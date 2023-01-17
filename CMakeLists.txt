@@ -29,6 +29,7 @@ add_executable(
             "external/logging/log.c" "external/logging/log.h"
             "main/hal/uart.hpp"
             "main/hal/lpuart.cpp" "main/hal/lpuart.hpp"
+            "main/hal/flash_ll.c" "main/hal/flash_ll.h"
             "main/mac/subghz.cpp" "main/mac/subghz.hpp"
             "main/mac/uart_cmd.cpp" "main/mac/uart_cmd.hpp"
             "external/lfbb/lfbb.hpp" "external/lfbb/lfbb_impl.hpp"
