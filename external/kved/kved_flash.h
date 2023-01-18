@@ -7,6 +7,10 @@ Copyright (c) 2022 Marcelo Barros de Almeida <marcelobarrosalmeida@gmail.com>
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
 @file
 @defgroup KVED_FLASH KVED_FLASH
@@ -59,6 +63,10 @@ uint32_t kved_flash_sector_size(void);
  @brief Flash initialization. It will depend on the driver implementation.
 */
 void kved_flash_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
 @}

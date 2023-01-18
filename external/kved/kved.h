@@ -7,6 +7,10 @@ Copyright (c) 2022 Marcelo Barros de Almeida <marcelobarrosalmeida@gmail.com>
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
 @file
 @defgroup KVED KVED
@@ -47,9 +51,9 @@ typedef uint64_t kved_word_t; /**< flash word data type */
 
 #if KVED_FLASH_WORD_SIZE == 8
 #define KVED_SIGNATURE_ENTRY  0xDEADBEEFDEADBEEFULL
-	#define KVED_DELETED_ENTRY    0x0000000000000000ULL
-	#define KVED_FREE_ENTRY       0xFFFFFFFFFFFFFFFFULL
-	#define KVED_HDR_ENTRY_MSK    0xFFFFFFFFFFFFFF00ULL
+#define KVED_DELETED_ENTRY    0x0000000000000000ULL
+#define KVED_FREE_ENTRY       0xFFFFFFFFFFFFFFFFULL
+#define KVED_HDR_ENTRY_MSK    0xFFFFFFFFFFFFFF00ULL
 #else
 #define KVED_SIGNATURE_ENTRY  0xDEADBEEFUL /**< kved signature */
 #define KVED_DELETED_ENTRY    0x00000000UL /**< deleted entry identification */
@@ -87,8 +91,8 @@ typedef enum kved_data_types_e
     KVED_DATA_TYPE_STRING,    /**< String up to @ref KVED_MAX_STRING_SIZE bytes, excluding terminator */
 #if KVED_FLASH_WORD_SIZE == 8
     KVED_DATA_TYPE_UINT64,    /**< 64 bits, signed */
-	KVED_DATA_TYPE_INT64,     /**< 64 bits, unsigned */
-	KVED_DATA_TYPE_DOUBLE,    /**< Double precision floating point (double) */
+    KVED_DATA_TYPE_INT64,     /**< 64 bits, unsigned */
+    KVED_DATA_TYPE_DOUBLE,    /**< Double precision floating point (double) */
 #endif
 } kved_data_types_t;
 
@@ -107,8 +111,8 @@ typedef union kved_value_u
     uint8_t str[KVED_MAX_STRING_SIZE]; /**< string */
 #if KVED_FLASH_WORD_SIZE == 8
     uint64_t u64; /**< unsigned 64 bits value */
-	int64_t i64; /**< signed 64 bits value */
-	double dbl; /**< double precision float */
+    int64_t i64; /**< signed 64 bits value */
+    double dbl; /**< double precision float */
 #endif
 } kved_value_t;
 
@@ -285,3 +289,7 @@ void kved_init(void);
 /**
 @}
 */
+
+#ifdef __cplusplus
+}
+#endif

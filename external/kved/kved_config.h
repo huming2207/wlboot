@@ -14,6 +14,10 @@ Copyright (c) 2022 Marcelo Barros de Almeida <marcelobarrosalmeida@gmail.com>
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "port_flash.h"
 
 
@@ -29,6 +33,10 @@ Copyright (c) 2022 Marcelo Barros de Almeida <marcelobarrosalmeida@gmail.com>
 #ifndef __weak
 #define __weak   __attribute__((weak))
 #endif
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /**

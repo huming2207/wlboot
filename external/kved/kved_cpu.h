@@ -14,6 +14,10 @@ Copyright (c) 2022 Marcelo Barros de Almeida <marcelobarrosalmeida@gmail.com>
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  @brief Critical section entry point
  */
@@ -23,6 +27,10 @@ void kved_cpu_critical_section_enter(void);
  @brief Critical section exit
  */
 void kved_cpu_critical_section_leave(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
 @}

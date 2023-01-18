@@ -6,7 +6,6 @@
 
 #include "flash_ll.h"
 
-const uint32_t sector_size[KVED_FLASH_NUM_SECTORS] = { STM32WL_FLASH_SECTOR_SIZE, STM32WL_FLASH_SECTOR_SIZE };
 const uint32_t sector_address[KVED_FLASH_NUM_SECTORS] = { 0x0803f000UL, 0x0803f800UL };
 const uint8_t sector_page[KVED_FLASH_NUM_SECTORS] = { 126, 127 };
 
