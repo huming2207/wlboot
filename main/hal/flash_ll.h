@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stm32wlxx_ll_system.h>
@@ -19,3 +23,7 @@ bool stm32wl_check_error();
 bool stm32wl_sector_erase(uint8_t idx);
 bool stm32wl_flash_write(uint32_t addr, uint64_t data);
 uint64_t stm32wl_flash_read_word(uint32_t addr);
+
+#ifdef __cplusplus
+}
+#endif
