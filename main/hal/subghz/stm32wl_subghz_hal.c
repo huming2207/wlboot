@@ -107,9 +107,8 @@ static bool subghz_wait_on_busy()
     return true;
 }
 
-sx126x_hal_status_t sx126x_hal_write(const void *context, const uint8_t *command, uint16_t command_length, const uint8_t *data, uint16_t data_length)
+sx126x_hal_status_t sx126x_hal_write(const uint8_t *command, uint16_t command_length, const uint8_t *data, uint16_t data_length)
 {
-    (void)context;
     volatile uint32_t primask = __get_PRIMASK();
     __disable_irq();
 
@@ -173,9 +172,8 @@ sx126x_hal_status_t sx126x_hal_write(const void *context, const uint8_t *command
     return SX126X_HAL_STATUS_OK;
 }
 
-sx126x_hal_status_t sx126x_hal_read(const void *context, const uint8_t *command, uint16_t command_length, uint8_t *data, uint16_t data_length)
+sx126x_hal_status_t sx126x_hal_read(const uint8_t *command, uint16_t command_length, uint8_t *data, uint16_t data_length)
 {
-    (void)context;
     volatile uint32_t primask = __get_PRIMASK();
     __disable_irq();
 
