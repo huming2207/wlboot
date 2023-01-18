@@ -18,13 +18,18 @@ file(GLOB_RECURSE SX126X_HAL_SRC
         "main/hal/subghz/*.h"
 )
 
+file(GLOB_RECURSE KVED_SRC
+        "external/kved/*.c"
+        "external/kved/*.h"
+)
+
 project(wlboot C CXX ASM)
 
 add_executable(
         wlboot
             "main/stm32wlxx_it.c" "main/stm32wlxx_it.h"
             "main/startup_stm32wle5xx.s" "main/system_stm32wlxx.c"
-            ${STM32_HAL_SRC} ${SX126X_HAL_SRC}
+            ${STM32_HAL_SRC} ${SX126X_HAL_SRC} ${KVED_SRC}
             "main/main.cpp" "main/misc.hpp"
             "external/logging/log.c" "external/logging/log.h"
             "main/hal/uart.hpp"
@@ -39,6 +44,7 @@ target_include_directories(wlboot PUBLIC
         "external/driver/Inc"
         "external/CMSIS/Device/ST/STM32WLxx/Include" "external/CMSIS/Include"
         "main" "external/logging" "external/logging/printf" "external/lfbb"
+        "external/kved"
         "main/hal" "main/mac"
 )
 
