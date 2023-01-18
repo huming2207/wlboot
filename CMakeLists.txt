@@ -109,6 +109,13 @@ else()
     )
 endif()
 
+if (STM32WL_HAS_TCXO MATCHES 1)
+    message(STATUS "wlboot: TCXO enabled")
+    target_compile_definitions(wlboot PUBLIC STM32WL_HAS_TCXO=1)
+elseif()
+    message(STATUS "wlboot: TCXO disabled")
+endif()
+
 set(linker_script "misc/stm32wle5.ld")
 set_target_properties(wlboot PROPERTIES SUFFIX ".elf")
 add_custom_command(TARGET wlboot POST_BUILD
