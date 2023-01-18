@@ -4,7 +4,7 @@
 #define STM32WL_FLASH_KEY1      0x45670123UL
 #define STM32WL_FLASH_KEY2      0xCDEF89ABUL
 
-  void stm32wl_flash_unlock()
+void stm32wl_flash_unlock()
 {
     if (READ_BIT(FLASH->CR, FLASH_CR_LOCK) != 0) {
         WRITE_REG(FLASH->KEYR, STM32WL_FLASH_KEY1);
