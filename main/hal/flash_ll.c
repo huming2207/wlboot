@@ -42,7 +42,7 @@ FLASH_RAM_FUNC void stm32wl_flash_wait()
     while(READ_BIT(FLASH->SR, FLASH_SR_BSY) != 0) {}
 }
 
-FLASH_RAM_FUNC bool stm32wl_check_error()
+FLASH_RAM_FUNC bool stm32wl_flash_check_error()
 {
     volatile bool has_err = false;
 
@@ -89,7 +89,7 @@ FLASH_RAM_FUNC bool stm32wl_check_error()
     return has_err;
 }
 
-FLASH_RAM_FUNC bool stm32wl_sector_erase(uint8_t idx)
+FLASH_RAM_FUNC bool stm32wl_flash_sector_erase(uint8_t idx)
 {
     // See RM0461 Section 3.3.7 and KVED reference code
     // 1. Wait first
@@ -107,7 +107,7 @@ FLASH_RAM_FUNC bool stm32wl_sector_erase(uint8_t idx)
 
     // 4. Wait and check error
     stm32wl_flash_wait();
-    if (stm32wl_check_error()) {
+    if (stm32wl_flash_check_error()) {
         return false;
     }
 
@@ -152,7 +152,7 @@ FLASH_RAM_FUNC bool stm32wl_flash_write(uint32_t addr, uint64_t data)
 
     // 4. Wait and check error
     stm32wl_flash_wait();
-    if (stm32wl_check_error()) {
+    if (stm32wl_flash_check_error()) {
         return false;
     }
 

@@ -15,7 +15,7 @@ bool kved_flash_sector_erase(kved_flash_sector_t sec)
         return false;
     }
 
-    return stm32wl_sector_erase(sector_page[sec]);
+    return stm32wl_flash_sector_erase(sector_page[sec]);
 }
 
 void kved_flash_data_write(kved_flash_sector_t sec, uint16_t index, kved_word_t data)
