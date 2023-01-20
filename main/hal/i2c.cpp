@@ -281,17 +281,17 @@ bool i2c3::init(bool fast_mode, bool enable_pull, i2c_def::timing_preset timing)
     LL_GPIO_InitTypeDef gpio_config = {};
 
     LL_RCC_SetI2CClockSource(LL_RCC_I2C2_CLKSOURCE_SYSCLK);
-    if (!LL_AHB2_GRP1_IsEnabledClock(LL_AHB2_GRP1_PERIPH_GPIOC)) {
-        LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOC);
+    if (!LL_AHB2_GRP1_IsEnabledClock(LL_AHB2_GRP1_PERIPH_GPIOB)) {
+        LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB);
     }
 
-    gpio_config.Pin = LL_GPIO_PIN_0 | LL_GPIO_PIN_1;
+    gpio_config.Pin = LL_GPIO_PIN_13 | LL_GPIO_PIN_14;
     gpio_config.Mode = LL_GPIO_MODE_ALTERNATE;
     gpio_config.Speed = LL_GPIO_SPEED_FREQ_LOW;
     gpio_config.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
     gpio_config.Pull = enable_pull ? LL_GPIO_PULL_UP : LL_GPIO_PULL_NO;
     gpio_config.Alternate = LL_GPIO_AF_4;
-    LL_GPIO_Init(GPIOC, &gpio_config);
+    LL_GPIO_Init(GPIOB, &gpio_config);
 
     if (!LL_APB1_GRP1_IsEnabledClock(LL_APB1_GRP1_PERIPH_I2C3)) {
         LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C3);
