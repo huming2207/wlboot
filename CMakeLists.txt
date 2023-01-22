@@ -38,7 +38,6 @@ add_executable(
             "main/hal/flash_ll.c" "main/hal/flash_ll.h"
             "main/hal/i2c.cpp" "main/hal/i2c.hpp"
             "main/hal/rtc_bin.c" "main/hal/rtc_bin.h"
-            "main/helper/soft_timer.cpp" "main/helper/soft_timer.hpp"
             "main/mac/subghz.cpp" "main/mac/subghz.hpp"
             "main/mac/uart_cmd.cpp" "main/mac/uart_cmd.hpp"
             "external/lfbb/lfbb.hpp" "external/lfbb/lfbb_impl.hpp"
