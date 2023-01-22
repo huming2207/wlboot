@@ -16,7 +16,9 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Memories definition */
 MEMORY
 {
-  ROM    (rx)    : ORIGIN = 0x08000000, LENGTH = 256K
+  ROM    (rx)    : ORIGIN = 0x08000000, LENGTH = 252K   /* The last two sectors are used for config */
+  KVED_A (rw)    : ORIGIN = 0x0803F000, LENGTH = 2K
+  KVED_B (rw)    : ORIGIN = 0x0803F800, LENGTH = 2K
   RAM1   (xrw)   : ORIGIN = 0x20000000, LENGTH = 32K    /* Non-backup SRAM1 */
   RAM2   (xrw)   : ORIGIN = 0x20008000, LENGTH = 32K    /* Backup SRAM2 */
 }
@@ -111,6 +113,7 @@ SECTIONS
     _sdata = .;        /* create a global symbol at data start */
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
+    *(.code_in_ram)    /* functions in RAM */
 
     . = ALIGN(8);
     _edata = .;        /* define a global symbol at data end */

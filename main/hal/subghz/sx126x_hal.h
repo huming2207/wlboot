@@ -83,7 +83,6 @@ typedef enum sx126x_hal_status_e
  *
  * @remark Shall be implemented by the user
  *
- * @param [in] context          Radio implementation parameters
  * @param [in] command          Pointer to the buffer to be transmitted
  * @param [in] command_length   Buffer size to be transmitted
  * @param [in] data             Pointer to the buffer to be transmitted
@@ -91,15 +90,13 @@ typedef enum sx126x_hal_status_e
  *
  * @returns Operation status
  */
-sx126x_hal_status_t sx126x_hal_write( const void* context, const uint8_t* command, uint16_t command_length,
-                                      const uint8_t* data, uint16_t data_length );
+sx126x_hal_status_t sx126x_hal_write(const uint8_t* command, uint16_t command_length, const uint8_t* data, uint16_t data_length );
 
 /**
  * Radio data transfer - read
  *
  * @remark Shall be implemented by the user
  *
- * @param [in] context          Radio implementation parameters
  * @param [in] command          Pointer to the buffer to be transmitted
  * @param [in] command_length   Buffer size to be transmitted
  * @param [in] data             Pointer to the buffer to be received
@@ -107,19 +104,17 @@ sx126x_hal_status_t sx126x_hal_write( const void* context, const uint8_t* comman
  *
  * @returns Operation status
  */
-sx126x_hal_status_t sx126x_hal_read( const void* context, const uint8_t* command, const uint16_t command_length,
-                                     uint8_t* data, const uint16_t data_length );
+sx126x_hal_status_t sx126x_hal_read(const uint8_t* command, uint16_t command_length, uint8_t* data, uint16_t data_length );
 
 /**
  * Reset the radio
  *
  * @remark Shall be implemented by the user
  *
- * @param [in] context Radio implementation parameters
  *
  * @returns Operation status
  */
-sx126x_hal_status_t sx126x_hal_reset( const void* context );
+sx126x_hal_status_t sx126x_hal_reset();
 
 /**
  * Wake the radio up.
@@ -130,7 +125,7 @@ sx126x_hal_status_t sx126x_hal_reset( const void* context );
  *
  * @returns Operation status
  */
-sx126x_hal_status_t sx126x_hal_wakeup( const void* context );
+sx126x_hal_status_t sx126x_hal_wakeup();
 
 #ifdef __cplusplus
 }

@@ -247,8 +247,7 @@ gfsk_bw_t gfsk_bw[] = {
  *
  * @returns Operation status
  */
-static sx126x_status_t sx126x_tx_modulation_workaround(const void *context, sx126x_pkt_type_t pkt_type,
-                                                       sx126x_lora_bw_t bw);
+static sx126x_status_t sx126x_tx_modulation_workaround(sx126x_pkt_type_t pkt_type, sx126x_lora_bw_t bw);
 
 static inline uint32_t sx126x_get_gfsk_crc_len_in_bytes(sx126x_gfsk_crc_types_t crc_type);
 
@@ -257,36 +256,36 @@ static inline uint32_t sx126x_get_gfsk_crc_len_in_bytes(sx126x_gfsk_crc_types_t 
  * --- PUBLIC FUNCTIONS DEFINITION ---------------------------------------------
  */
 
-sx126x_status_t sx126x_set_sleep(const void *context, const sx126x_sleep_cfgs_t cfg)
+sx126x_status_t sx126x_set_sleep(const sx126x_sleep_cfgs_t cfg)
 {
     const uint8_t buf[SX126X_SIZE_SET_SLEEP] = {
             SX126X_SET_SLEEP,
             (uint8_t) cfg,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_SLEEP, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_SLEEP, 0, 0);
 }
 
-sx126x_status_t sx126x_set_standby(const void *context, const sx126x_standby_cfg_t cfg)
+sx126x_status_t sx126x_set_standby(const sx126x_standby_cfg_t cfg)
 {
     const uint8_t buf[SX126X_SIZE_SET_STANDBY] = {
             SX126X_SET_STANDBY,
             (uint8_t) cfg,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_STANDBY, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_STANDBY, 0, 0);
 }
 
-sx126x_status_t sx126x_set_fs(const void *context)
+sx126x_status_t sx126x_set_fs()
 {
     const uint8_t buf[SX126X_SIZE_SET_FS] = {
             SX126X_SET_FS,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_FS, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_FS, 0, 0);
 }
 
-sx126x_status_t sx126x_set_tx(const void *context, const uint32_t timeout_in_ms)
+sx126x_status_t sx126x_set_tx(const uint32_t timeout_in_ms)
 {
     if (timeout_in_ms > SX126X_MAX_TIMEOUT_IN_MS) {
         return SX126X_STATUS_UNKNOWN_VALUE;
@@ -294,10 +293,10 @@ sx126x_status_t sx126x_set_tx(const void *context, const uint32_t timeout_in_ms)
 
     const uint32_t timeout_in_rtc_step = sx126x_convert_timeout_in_ms_to_rtc_step(timeout_in_ms);
 
-    return sx126x_set_tx_with_timeout_in_rtc_step(context, timeout_in_rtc_step);
+    return sx126x_set_tx_with_timeout_in_rtc_step(timeout_in_rtc_step);
 }
 
-sx126x_status_t sx126x_set_tx_with_timeout_in_rtc_step(const void *context, const uint32_t timeout_in_rtc_step)
+sx126x_status_t sx126x_set_tx_with_timeout_in_rtc_step(const uint32_t timeout_in_rtc_step)
 {
     const uint8_t buf[SX126X_SIZE_SET_TX] = {
             SX126X_SET_TX,
@@ -306,10 +305,10 @@ sx126x_status_t sx126x_set_tx_with_timeout_in_rtc_step(const void *context, cons
             (uint8_t) (timeout_in_rtc_step >> 0),
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_TX, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_TX, 0, 0);
 }
 
-sx126x_status_t sx126x_set_rx(const void *context, const uint32_t timeout_in_ms)
+sx126x_status_t sx126x_set_rx(const uint32_t timeout_in_ms)
 {
     if (timeout_in_ms > SX126X_MAX_TIMEOUT_IN_MS) {
         return SX126X_STATUS_UNKNOWN_VALUE;
@@ -317,10 +316,10 @@ sx126x_status_t sx126x_set_rx(const void *context, const uint32_t timeout_in_ms)
 
     const uint32_t timeout_in_rtc_step = sx126x_convert_timeout_in_ms_to_rtc_step(timeout_in_ms);
 
-    return sx126x_set_rx_with_timeout_in_rtc_step(context, timeout_in_rtc_step);
+    return sx126x_set_rx_with_timeout_in_rtc_step(timeout_in_rtc_step);
 }
 
-sx126x_status_t sx126x_set_rx_with_timeout_in_rtc_step(const void *context, const uint32_t timeout_in_rtc_step)
+sx126x_status_t sx126x_set_rx_with_timeout_in_rtc_step(const uint32_t timeout_in_rtc_step)
 {
     const uint8_t buf[SX126X_SIZE_SET_RX] = {
             SX126X_SET_RX,
@@ -329,31 +328,28 @@ sx126x_status_t sx126x_set_rx_with_timeout_in_rtc_step(const void *context, cons
             (uint8_t) (timeout_in_rtc_step >> 0),
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_RX, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_RX, 0, 0);
 }
 
-sx126x_status_t sx126x_stop_timer_on_preamble(const void *context, const bool enable)
+sx126x_status_t sx126x_stop_timer_on_preamble(bool enable)
 {
     const uint8_t buf[SX126X_SIZE_SET_STOP_TIMER_ON_PREAMBLE] = {
             SX126X_SET_STOP_TIMER_ON_PREAMBLE,
             (enable == true) ? 1 : 0,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_STOP_TIMER_ON_PREAMBLE, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_STOP_TIMER_ON_PREAMBLE, 0, 0);
 }
 
-sx126x_status_t sx126x_set_rx_duty_cycle(const void *context, const uint32_t rx_time_in_ms,
-                                         const uint32_t sleep_time_in_ms)
+sx126x_status_t sx126x_set_rx_duty_cycle(uint32_t rx_time_in_ms, uint32_t sleep_time_in_ms)
 {
     const uint32_t rx_time_in_rtc_step = sx126x_convert_timeout_in_ms_to_rtc_step(rx_time_in_ms);
     const uint32_t sleep_time_in_rtc_step = sx126x_convert_timeout_in_ms_to_rtc_step(sleep_time_in_ms);
 
-    return sx126x_set_rx_duty_cycle_with_timings_in_rtc_step(context, rx_time_in_rtc_step, sleep_time_in_rtc_step);
+    return sx126x_set_rx_duty_cycle_with_timings_in_rtc_step(rx_time_in_rtc_step, sleep_time_in_rtc_step);
 }
 
-sx126x_status_t sx126x_set_rx_duty_cycle_with_timings_in_rtc_step(const void *context,
-                                                                  const uint32_t rx_time_in_rtc_step,
-                                                                  const uint32_t sleep_time_in_rtc_step)
+sx126x_status_t sx126x_set_rx_duty_cycle_with_timings_in_rtc_step(uint32_t rx_time_in_rtc_step, uint32_t sleep_time_in_rtc_step)
 {
     const uint8_t buf[SX126X_SIZE_SET_RX_DUTY_CYCLE] = {
             SX126X_SET_RX_DUTY_CYCLE,
@@ -365,57 +361,57 @@ sx126x_status_t sx126x_set_rx_duty_cycle_with_timings_in_rtc_step(const void *co
             (uint8_t) (sleep_time_in_rtc_step >> 0),
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_RX_DUTY_CYCLE, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_RX_DUTY_CYCLE, 0, 0);
 }
 
-sx126x_status_t sx126x_set_cad(const void *context)
+sx126x_status_t sx126x_set_cad()
 {
     const uint8_t buf[SX126X_SIZE_SET_CAD] = {
             SX126X_SET_CAD,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_CAD, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_CAD, 0, 0);
 }
 
-sx126x_status_t sx126x_set_tx_cw(const void *context)
+sx126x_status_t sx126x_set_tx_cw()
 {
     const uint8_t buf[SX126X_SIZE_SET_TX_CONTINUOUS_WAVE] = {
             SX126X_SET_TX_CONTINUOUS_WAVE,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_TX_CONTINUOUS_WAVE, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_TX_CONTINUOUS_WAVE, 0, 0);
 }
 
-sx126x_status_t sx126x_set_tx_infinite_preamble(const void *context)
+sx126x_status_t sx126x_set_tx_infinite_preamble()
 {
     const uint8_t buf[SX126X_SIZE_SET_TX_INFINITE_PREAMBLE] = {
             SX126X_SET_TX_INFINITE_PREAMBLE,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_TX_INFINITE_PREAMBLE, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_TX_INFINITE_PREAMBLE, 0, 0);
 }
 
-sx126x_status_t sx126x_set_reg_mode(const void *context, const sx126x_reg_mod_t mode)
+sx126x_status_t sx126x_set_reg_mode(sx126x_reg_mod_t mode)
 {
     const uint8_t buf[SX126X_SIZE_SET_REGULATOR_MODE] = {
             SX126X_SET_REGULATOR_MODE,
             (uint8_t) mode,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_REGULATOR_MODE, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_REGULATOR_MODE, 0, 0);
 }
 
-sx126x_status_t sx126x_cal(const void *context, const sx126x_cal_mask_t param)
+sx126x_status_t sx126x_cal(sx126x_cal_mask_t param)
 {
     const uint8_t buf[SX126X_SIZE_CALIBRATE] = {
             SX126X_CALIBRATE,
             (uint8_t) param,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_CALIBRATE, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_CALIBRATE, 0, 0);
 }
 
-sx126x_status_t sx126x_cal_img(const void *context, const uint8_t freq1, const uint8_t freq2)
+sx126x_status_t sx126x_cal_img(uint8_t freq1, uint8_t freq2)
 {
     const uint8_t buf[SX126X_SIZE_CALIBRATE_IMAGE] = {
             SX126X_CALIBRATE_IMAGE,
@@ -423,10 +419,10 @@ sx126x_status_t sx126x_cal_img(const void *context, const uint8_t freq1, const u
             freq2,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_CALIBRATE_IMAGE, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_CALIBRATE_IMAGE, 0, 0);
 }
 
-sx126x_status_t sx126x_cal_img_in_mhz(const void *context, const uint16_t freq1_in_mhz, const uint16_t freq2_in_mhz)
+sx126x_status_t sx126x_cal_img_in_mhz(uint16_t freq1_in_mhz, uint16_t freq2_in_mhz)
 {
     // Perform a floor() to get a value for freq1 corresponding to a frequency lower than or equal to freq1_in_mhz
     const uint8_t freq1 = freq1_in_mhz / SX126X_IMAGE_CALIBRATION_STEP_IN_MHZ;
@@ -435,34 +431,33 @@ sx126x_status_t sx126x_cal_img_in_mhz(const void *context, const uint16_t freq1_
     const uint8_t freq2 =
             (freq2_in_mhz + SX126X_IMAGE_CALIBRATION_STEP_IN_MHZ - 1) / SX126X_IMAGE_CALIBRATION_STEP_IN_MHZ;
 
-    return sx126x_cal_img(context, freq1, freq2);
+    return sx126x_cal_img(freq1, freq2);
 }
 
-sx126x_status_t sx126x_set_pa_cfg(const void *context, const sx126x_pa_cfg_params_t *params)
+sx126x_status_t sx126x_set_pa_cfg(const sx126x_pa_cfg_params_t *params)
 {
     const uint8_t buf[SX126X_SIZE_SET_PA_CFG] = {
             SX126X_SET_PA_CFG, params->pa_duty_cycle, params->hp_max, params->device_sel, params->pa_lut,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_PA_CFG, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_PA_CFG, 0, 0);
 }
 
-sx126x_status_t sx126x_set_rx_tx_fallback_mode(const void *context, const sx126x_fallback_modes_t fallback_mode)
+sx126x_status_t sx126x_set_rx_tx_fallback_mode(sx126x_fallback_modes_t fallback_mode)
 {
     const uint8_t buf[SX126X_SIZE_SET_RX_TX_FALLBACK_MODE] = {
             SX126X_SET_RX_TX_FALLBACK_MODE,
             (uint8_t) fallback_mode,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_RX_TX_FALLBACK_MODE, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_RX_TX_FALLBACK_MODE, 0, 0);
 }
 
 //
 // Registers and buffer Access
 //
 
-sx126x_status_t sx126x_write_register(const void *context, const uint16_t address, const uint8_t *buffer,
-                                      const uint8_t size)
+sx126x_status_t sx126x_write_register(uint16_t address, const uint8_t *buffer, uint8_t size)
 {
     const uint8_t buf[SX126X_SIZE_WRITE_REGISTER] = {
             SX126X_WRITE_REGISTER,
@@ -470,10 +465,10 @@ sx126x_status_t sx126x_write_register(const void *context, const uint16_t addres
             (uint8_t) (address >> 0),
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_WRITE_REGISTER, buffer, size);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_WRITE_REGISTER, buffer, size);
 }
 
-sx126x_status_t sx126x_read_register(const void *context, const uint16_t address, uint8_t *buffer, const uint8_t size)
+sx126x_status_t sx126x_read_register(uint16_t address, uint8_t *buffer, uint8_t size)
 {
     const uint8_t buf[SX126X_SIZE_READ_REGISTER] = {
             SX126X_READ_REGISTER,
@@ -482,21 +477,20 @@ sx126x_status_t sx126x_read_register(const void *context, const uint16_t address
             SX126X_NOP,
     };
 
-    return (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_READ_REGISTER, buffer, size);
+    return (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_READ_REGISTER, buffer, size);
 }
 
-sx126x_status_t sx126x_write_buffer(const void *context, const uint8_t offset, const uint8_t *buffer,
-                                    const uint8_t size)
+sx126x_status_t sx126x_write_buffer(uint8_t offset, const uint8_t *buffer, uint8_t size)
 {
     const uint8_t buf[SX126X_SIZE_WRITE_BUFFER] = {
             SX126X_WRITE_BUFFER,
             offset,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_WRITE_BUFFER, buffer, size);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_WRITE_BUFFER, buffer, size);
 }
 
-sx126x_status_t sx126x_read_buffer(const void *context, const uint8_t offset, uint8_t *buffer, const uint8_t size)
+sx126x_status_t sx126x_read_buffer(uint8_t offset, uint8_t *buffer, uint8_t size)
 {
     const uint8_t buf[SX126X_SIZE_READ_BUFFER] = {
             SX126X_READ_BUFFER,
@@ -504,14 +498,13 @@ sx126x_status_t sx126x_read_buffer(const void *context, const uint8_t offset, ui
             SX126X_NOP,
     };
 
-    return (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_READ_BUFFER, buffer, size);
+    return (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_READ_BUFFER, buffer, size);
 }
 
 //
 // DIO and IRQ Control Functions
 //
-sx126x_status_t sx126x_set_dio_irq_params(const void *context, const uint16_t irq_mask, const uint16_t dio1_mask,
-                                          const uint16_t dio2_mask, const uint16_t dio3_mask)
+sx126x_status_t sx126x_set_dio_irq_params(uint16_t irq_mask, uint16_t dio1_mask, uint16_t dio2_mask, uint16_t dio3_mask)
 {
     const uint8_t buf[SX126X_SIZE_SET_DIO_IRQ_PARAMS] = {
             SX126X_SET_DIO_IRQ_PARAMS, (uint8_t) (irq_mask >> 8), (uint8_t) (irq_mask >> 0),
@@ -519,10 +512,10 @@ sx126x_status_t sx126x_set_dio_irq_params(const void *context, const uint16_t ir
             (uint8_t) (dio2_mask >> 0), (uint8_t) (dio3_mask >> 8), (uint8_t) (dio3_mask >> 0),
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_DIO_IRQ_PARAMS, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_DIO_IRQ_PARAMS, 0, 0);
 }
 
-sx126x_status_t sx126x_get_irq_status(const void *context, sx126x_irq_mask_t *irq)
+sx126x_status_t sx126x_get_irq_status(sx126x_irq_mask_t *irq)
 {
     const uint8_t buf[SX126X_SIZE_GET_IRQ_STATUS] = {
             SX126X_GET_IRQ_STATUS,
@@ -531,7 +524,7 @@ sx126x_status_t sx126x_get_irq_status(const void *context, sx126x_irq_mask_t *ir
     uint8_t irq_local[sizeof(sx126x_irq_mask_t)] = {0x00};
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
-    status = (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_GET_IRQ_STATUS, irq_local,
+    status = (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_GET_IRQ_STATUS, irq_local,
                                                sizeof(sx126x_irq_mask_t));
 
     if (status == SX126X_STATUS_OK) {
@@ -541,7 +534,7 @@ sx126x_status_t sx126x_get_irq_status(const void *context, sx126x_irq_mask_t *ir
     return status;
 }
 
-sx126x_status_t sx126x_clear_irq_status(const void *context, const sx126x_irq_mask_t irq_mask)
+sx126x_status_t sx126x_clear_irq_status(sx126x_irq_mask_t irq_mask)
 {
     const uint8_t buf[SX126X_SIZE_CLR_IRQ_STATUS] = {
             SX126X_CLR_IRQ_STATUS,
@@ -549,17 +542,17 @@ sx126x_status_t sx126x_clear_irq_status(const void *context, const sx126x_irq_ma
             (uint8_t) (irq_mask >> 0),
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_CLR_IRQ_STATUS, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_CLR_IRQ_STATUS, 0, 0);
 }
 
-sx126x_status_t sx126x_get_and_clear_irq_status(const void *context, sx126x_irq_mask_t *irq)
+sx126x_status_t sx126x_get_and_clear_irq_status(sx126x_irq_mask_t *irq)
 {
     sx126x_irq_mask_t sx126x_irq_mask = SX126X_IRQ_NONE;
 
-    sx126x_status_t status = sx126x_get_irq_status(context, &sx126x_irq_mask);
+    sx126x_status_t status = sx126x_get_irq_status(&sx126x_irq_mask);
 
     if ((status == SX126X_STATUS_OK) && (sx126x_irq_mask != 0)) {
-        status = sx126x_clear_irq_status(context, sx126x_irq_mask);
+        status = sx126x_clear_irq_status(sx126x_irq_mask);
     }
     if ((status == SX126X_STATUS_OK) && (irq != NULL)) {
         *irq = sx126x_irq_mask;
@@ -567,69 +560,68 @@ sx126x_status_t sx126x_get_and_clear_irq_status(const void *context, sx126x_irq_
     return status;
 }
 
-sx126x_status_t sx126x_set_dio2_as_rf_sw_ctrl(const void *context, const bool enable)
+sx126x_status_t sx126x_set_dio2_as_rf_sw_ctrl(bool enable)
 {
     const uint8_t buf[SX126X_SIZE_SET_DIO2_AS_RF_SWITCH_CTRL] = {
             SX126X_SET_DIO2_AS_RF_SWITCH_CTRL,
             (enable == true) ? 1 : 0,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_DIO2_AS_RF_SWITCH_CTRL, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_DIO2_AS_RF_SWITCH_CTRL, 0, 0);
 }
 
-sx126x_status_t sx126x_set_dio3_as_tcxo_ctrl(const void *context, const sx126x_tcxo_ctrl_voltages_t tcxo_voltage,
-                                             const uint32_t timeout)
+sx126x_status_t sx126x_set_dio3_as_tcxo_ctrl(sx126x_tcxo_ctrl_voltages_t tcxo_voltage, uint32_t timeout)
 {
     const uint8_t buf[SX126X_SIZE_SET_DIO3_AS_TCXO_CTRL] = {
             SX126X_SET_DIO3_AS_TCXO_CTRL, (uint8_t) tcxo_voltage, (uint8_t) (timeout >> 16),
             (uint8_t) (timeout >> 8), (uint8_t) (timeout >> 0),
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_DIO3_AS_TCXO_CTRL, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_DIO3_AS_TCXO_CTRL, 0, 0);
 }
 
 //
 // RF Modulation and Packet-Related Functions
 //
 
-sx126x_status_t sx126x_set_rf_freq(const void *context, const uint32_t freq_in_hz)
+sx126x_status_t sx126x_set_rf_freq(uint32_t freq_in_hz)
 {
     const uint32_t freq = sx126x_convert_freq_in_hz_to_pll_step(freq_in_hz);
 
-    return sx126x_set_rf_freq_in_pll_steps(context, freq);
+    return sx126x_set_rf_freq_in_pll_steps(freq);
 }
 
-sx126x_status_t sx126x_set_rf_freq_in_pll_steps(const void *context, const uint32_t freq)
+sx126x_status_t sx126x_set_rf_freq_in_pll_steps(uint32_t freq)
 {
     const uint8_t buf[SX126X_SIZE_SET_RF_FREQUENCY] = {
             SX126X_SET_RF_FREQUENCY, (uint8_t) (freq >> 24), (uint8_t) (freq >> 16),
             (uint8_t) (freq >> 8), (uint8_t) (freq >> 0),
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_RF_FREQUENCY, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_RF_FREQUENCY, 0, 0);
 }
 
-sx126x_status_t sx126x_set_pkt_type(const void *context, const sx126x_pkt_type_t pkt_type)
+sx126x_status_t sx126x_set_pkt_type(sx126x_pkt_type_t pkt_type)
 {
     const uint8_t buf[SX126X_SIZE_SET_PKT_TYPE] = {
             SX126X_SET_PKT_TYPE,
             (uint8_t) pkt_type,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_PKT_TYPE, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_PKT_TYPE, 0, 0);
 }
 
-sx126x_status_t sx126x_get_pkt_type(const void *context, sx126x_pkt_type_t *pkt_type)
+sx126x_status_t sx126x_get_pkt_type(sx126x_pkt_type_t *pkt_type)
 {
     const uint8_t buf[SX126X_SIZE_GET_PKT_TYPE] = {
             SX126X_GET_PKT_TYPE,
             SX126X_NOP,
     };
 
-    return (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_GET_PKT_TYPE, (uint8_t *) pkt_type, 1);
+    return (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_GET_PKT_TYPE, (uint8_t *) pkt_type, 1);
 }
 
-sx126x_status_t sx126x_set_tx_params(const void *context, const int8_t pwr_in_dbm, const sx126x_ramp_time_t ramp_time)
+sx126x_status_t sx126x_set_tx_params(const int8_t pwr_in_dbm, const sx126x_ramp_time_t ramp_time)
 {
     const uint8_t buf[SX126X_SIZE_SET_TX_PARAMS] = {
             SX126X_SET_TX_PARAMS,
@@ -637,10 +629,10 @@ sx126x_status_t sx126x_set_tx_params(const void *context, const int8_t pwr_in_db
             (uint8_t) ramp_time,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_TX_PARAMS, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_TX_PARAMS, 0, 0);
 }
 
-sx126x_status_t sx126x_set_gfsk_mod_params(const void *context, const sx126x_mod_params_gfsk_t *params)
+sx126x_status_t sx126x_set_gfsk_mod_params(sx126x_mod_params_gfsk_t *params)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     const uint32_t bitrate = (uint32_t) (32 * SX126X_XTAL_FREQ / params->br_in_bps);
@@ -651,17 +643,17 @@ sx126x_status_t sx126x_set_gfsk_mod_params(const void *context, const sx126x_mod
             (uint8_t) (fdev >> 16), (uint8_t) (fdev >> 8), (uint8_t) (fdev >> 0),
     };
 
-    status = (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_MODULATION_PARAMS_GFSK, 0, 0);
+    status = (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_MODULATION_PARAMS_GFSK, 0, 0);
 
     if (status == SX126X_STATUS_OK) {
         // WORKAROUND - Modulation Quality with 500 kHz LoRa Bandwidth, see DS_SX1261-2_V1.2 datasheet chapter 15.1
-        status = sx126x_tx_modulation_workaround(context, SX126X_PKT_TYPE_GFSK, (sx126x_lora_bw_t) 0);
+        status = sx126x_tx_modulation_workaround(SX126X_PKT_TYPE_GFSK, (sx126x_lora_bw_t) 0);
         // WORKAROUND END
     }
     return status;
 }
 
-sx126x_status_t sx126x_set_lora_mod_params(const void *context, const sx126x_mod_params_lora_t *params)
+sx126x_status_t sx126x_set_lora_mod_params(sx126x_mod_params_lora_t *params)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     const uint8_t buf[SX126X_SIZE_SET_MODULATION_PARAMS_LORA] = {
@@ -669,18 +661,18 @@ sx126x_status_t sx126x_set_lora_mod_params(const void *context, const sx126x_mod
             (uint8_t) (params->cr), params->ldro & 0x01,
     };
 
-    status = (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_MODULATION_PARAMS_LORA, 0, 0);
+    status = (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_MODULATION_PARAMS_LORA, 0, 0);
 
     if (status == SX126X_STATUS_OK) {
         // WORKAROUND - Modulation Quality with 500 kHz LoRa Bandwidth, see datasheet DS_SX1261-2_V1.2 §15.1
-        status = sx126x_tx_modulation_workaround(context, SX126X_PKT_TYPE_LORA, params->bw);
+        status = sx126x_tx_modulation_workaround(SX126X_PKT_TYPE_LORA, params->bw);
         // WORKAROUND END
     }
 
     return status;
 }
 
-sx126x_status_t sx126x_set_gfsk_pkt_params(const void *context, const sx126x_pkt_params_gfsk_t *params)
+sx126x_status_t sx126x_set_gfsk_pkt_params(sx126x_pkt_params_gfsk_t *params)
 {
     const uint8_t buf[SX126X_SIZE_SET_PKT_PARAMS_GFSK] = {
             SX126X_SET_PKT_PARAMS,
@@ -695,10 +687,10 @@ sx126x_status_t sx126x_set_gfsk_pkt_params(const void *context, const sx126x_pkt
             (uint8_t) (params->dc_free),
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_PKT_PARAMS_GFSK, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_PKT_PARAMS_GFSK, 0, 0);
 }
 
-sx126x_status_t sx126x_set_lora_pkt_params(const void *context, const sx126x_pkt_params_lora_t *params)
+sx126x_status_t sx126x_set_lora_pkt_params(sx126x_pkt_params_lora_t *params)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
@@ -712,20 +704,20 @@ sx126x_status_t sx126x_set_lora_pkt_params(const void *context, const sx126x_pkt
             (uint8_t) (params->invert_iq_is_on ? 1 : 0),
     };
 
-    status = (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_PKT_PARAMS_LORA, 0, 0);
+    status = (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_PKT_PARAMS_LORA, 0, 0);
 
     // WORKAROUND - Optimizing the Inverted IQ Operation, see datasheet DS_SX1261-2_V1.2 §15.4
     if (status == SX126X_STATUS_OK) {
         uint8_t reg_value = 0;
 
-        status = sx126x_read_register(context, SX126X_REG_IQ_POLARITY, &reg_value, 1);
+        status = sx126x_read_register(SX126X_REG_IQ_POLARITY, &reg_value, 1);
         if (status == SX126X_STATUS_OK) {
             if (params->invert_iq_is_on == true) {
                 reg_value &= ~(1 << 2);  // Bit 2 set to 0 when using inverted IQ polarity
             } else {
                 reg_value |= (1 << 2);  // Bit 2 set to 1 when using standard IQ polarity
             }
-            status = sx126x_write_register(context, SX126X_REG_IQ_POLARITY, &reg_value, 1);
+            status = sx126x_write_register(SX126X_REG_IQ_POLARITY, &reg_value, 1);
         }
     }
     // WORKAROUND END
@@ -733,7 +725,7 @@ sx126x_status_t sx126x_set_lora_pkt_params(const void *context, const sx126x_pkt
     return status;
 }
 
-sx126x_status_t sx126x_set_cad_params(const void *context, const sx126x_cad_params_t *params)
+sx126x_status_t sx126x_set_cad_params(sx126x_cad_params_t *params)
 {
     const uint8_t buf[SX126X_SIZE_SET_CAD_PARAMS] = {
             SX126X_SET_CAD_PARAMS,
@@ -746,11 +738,10 @@ sx126x_status_t sx126x_set_cad_params(const void *context, const sx126x_cad_para
             (uint8_t) (params->cad_timeout >> 0),
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_CAD_PARAMS, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_CAD_PARAMS, 0, 0);
 }
 
-sx126x_status_t sx126x_set_buffer_base_address(const void *context, const uint8_t tx_base_address,
-                                               const uint8_t rx_base_address)
+sx126x_status_t sx126x_set_buffer_base_address(uint8_t tx_base_address, uint8_t rx_base_address)
 {
     const uint8_t buf[SX126X_SIZE_SET_BUFFER_BASE_ADDRESS] = {
             SX126X_SET_BUFFER_BASE_ADDRESS,
@@ -758,10 +749,10 @@ sx126x_status_t sx126x_set_buffer_base_address(const void *context, const uint8_
             rx_base_address,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_BUFFER_BASE_ADDRESS, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_BUFFER_BASE_ADDRESS, 0, 0);
 }
 
-sx126x_status_t sx126x_set_lora_symb_nb_timeout(const void *context, const uint8_t nb_of_symbs)
+sx126x_status_t sx126x_set_lora_symb_nb_timeout(uint8_t nb_of_symbs)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     uint8_t exp = 0;
@@ -780,11 +771,11 @@ sx126x_status_t sx126x_set_lora_symb_nb_timeout(const void *context, const uint8
             mant << (2 * exp + 1),
     };
 
-    status = (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_SET_LORA_SYMB_NUM_TIMEOUT, 0, 0);
+    status = (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_SET_LORA_SYMB_NUM_TIMEOUT, 0, 0);
 
     if ((status == SX126X_STATUS_OK) && (nb_of_symbs > 0)) {
         uint8_t reg = exp + (mant << 3);
-        status = sx126x_write_register(context, SX126X_REG_LR_SYNCH_TIMEOUT, &reg, 1);
+        status = sx126x_write_register(SX126X_REG_LR_SYNCH_TIMEOUT, &reg, 1);
     }
 
     return status;
@@ -794,7 +785,7 @@ sx126x_status_t sx126x_set_lora_symb_nb_timeout(const void *context, const uint8
 // Communication Status Information
 //
 
-sx126x_status_t sx126x_get_status(const void *context, sx126x_chip_status_t *radio_status)
+sx126x_status_t sx126x_get_status(sx126x_chip_status_t *radio_status)
 {
     const uint8_t buf[SX126X_SIZE_GET_STATUS] = {
             SX126X_GET_STATUS,
@@ -802,7 +793,7 @@ sx126x_status_t sx126x_get_status(const void *context, sx126x_chip_status_t *rad
     uint8_t status_local = 0;
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
-    status = (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_GET_STATUS, &status_local, 1);
+    status = (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_GET_STATUS, &status_local, 1);
 
     if (status == SX126X_STATUS_OK) {
         radio_status->cmd_status =
@@ -814,7 +805,7 @@ sx126x_status_t sx126x_get_status(const void *context, sx126x_chip_status_t *rad
     return status;
 }
 
-sx126x_status_t sx126x_get_rx_buffer_status(const void *context, sx126x_rx_buffer_status_t *rx_buffer_status)
+sx126x_status_t sx126x_get_rx_buffer_status(sx126x_rx_buffer_status_t *rx_buffer_status)
 {
     const uint8_t buf[SX126X_SIZE_GET_RX_BUFFER_STATUS] = {
             SX126X_GET_RX_BUFFER_STATUS,
@@ -823,7 +814,7 @@ sx126x_status_t sx126x_get_rx_buffer_status(const void *context, sx126x_rx_buffe
     uint8_t status_local[sizeof(sx126x_rx_buffer_status_t)] = {0x00};
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
-    status = (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_GET_RX_BUFFER_STATUS, status_local,
+    status = (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_GET_RX_BUFFER_STATUS, status_local,
                                                sizeof(sx126x_rx_buffer_status_t));
 
     if (status == SX126X_STATUS_OK) {
@@ -834,7 +825,7 @@ sx126x_status_t sx126x_get_rx_buffer_status(const void *context, sx126x_rx_buffe
     return status;
 }
 
-sx126x_status_t sx126x_get_gfsk_pkt_status(const void *context, sx126x_pkt_status_gfsk_t *pkt_status)
+sx126x_status_t sx126x_get_gfsk_pkt_status(sx126x_pkt_status_gfsk_t *pkt_status)
 {
     const uint8_t buf[SX126X_SIZE_GET_PKT_STATUS] = {
             SX126X_GET_PKT_STATUS,
@@ -843,7 +834,7 @@ sx126x_status_t sx126x_get_gfsk_pkt_status(const void *context, sx126x_pkt_statu
     uint8_t pkt_status_local[3] = {0x00};
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
-    status = (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_GET_PKT_STATUS, pkt_status_local, 3);
+    status = (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_GET_PKT_STATUS, pkt_status_local, 3);
 
     if (status == SX126X_STATUS_OK) {
         pkt_status->rx_status.pkt_sent =
@@ -866,7 +857,7 @@ sx126x_status_t sx126x_get_gfsk_pkt_status(const void *context, sx126x_pkt_statu
     return status;
 }
 
-sx126x_status_t sx126x_get_lora_pkt_status(const void *context, sx126x_pkt_status_lora_t *pkt_status)
+sx126x_status_t sx126x_get_lora_pkt_status(sx126x_pkt_status_lora_t *pkt_status)
 {
     const uint8_t buf[SX126X_SIZE_GET_PKT_STATUS] = {
             SX126X_GET_PKT_STATUS,
@@ -875,7 +866,7 @@ sx126x_status_t sx126x_get_lora_pkt_status(const void *context, sx126x_pkt_statu
     uint8_t pkt_status_local[sizeof(sx126x_pkt_status_lora_t)] = {0x00};
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
-    status = (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_GET_PKT_STATUS, pkt_status_local,
+    status = (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_GET_PKT_STATUS, pkt_status_local,
                                                sizeof(sx126x_pkt_status_lora_t));
 
     if (status == SX126X_STATUS_OK) {
@@ -887,7 +878,7 @@ sx126x_status_t sx126x_get_lora_pkt_status(const void *context, sx126x_pkt_statu
     return status;
 }
 
-sx126x_status_t sx126x_get_rssi_inst(const void *context, int16_t *rssi_in_dbm)
+sx126x_status_t sx126x_get_rssi_inst(int16_t *rssi_in_dbm)
 {
     const uint8_t buf[SX126X_SIZE_GET_RSSI_INST] = {
             SX126X_GET_RSSI_INST,
@@ -896,7 +887,7 @@ sx126x_status_t sx126x_get_rssi_inst(const void *context, int16_t *rssi_in_dbm)
     uint8_t rssi_local = 0x00;
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
-    status = (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_GET_RSSI_INST, &rssi_local, 1);
+    status = (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_GET_RSSI_INST, &rssi_local, 1);
 
     if (status == SX126X_STATUS_OK) {
         *rssi_in_dbm = (int8_t) (-rssi_local >> 1);
@@ -905,7 +896,7 @@ sx126x_status_t sx126x_get_rssi_inst(const void *context, int16_t *rssi_in_dbm)
     return status;
 }
 
-sx126x_status_t sx126x_get_gfsk_stats(const void *context, sx126x_stats_gfsk_t *stats)
+sx126x_status_t sx126x_get_gfsk_stats(sx126x_stats_gfsk_t *stats)
 {
     const uint8_t buf[SX126X_SIZE_GET_STATS] = {
             SX126X_GET_STATS,
@@ -914,7 +905,7 @@ sx126x_status_t sx126x_get_gfsk_stats(const void *context, sx126x_stats_gfsk_t *
     uint8_t stats_local[sizeof(sx126x_stats_gfsk_t)] = {0};
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
-    status = (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_GET_STATS, stats_local,
+    status = (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_GET_STATS, stats_local,
                                                sizeof(sx126x_stats_gfsk_t));
 
     if (status == SX126X_STATUS_OK) {
@@ -926,7 +917,7 @@ sx126x_status_t sx126x_get_gfsk_stats(const void *context, sx126x_stats_gfsk_t *
     return status;
 }
 
-sx126x_status_t sx126x_get_lora_stats(const void *context, sx126x_stats_lora_t *stats)
+sx126x_status_t sx126x_get_lora_stats(sx126x_stats_lora_t *stats)
 {
     const uint8_t buf[SX126X_SIZE_GET_STATS] = {
             SX126X_GET_STATS,
@@ -935,7 +926,7 @@ sx126x_status_t sx126x_get_lora_stats(const void *context, sx126x_stats_lora_t *
     uint8_t stats_local[sizeof(sx126x_stats_lora_t)] = {0};
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
-    status = (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_GET_STATS, stats_local,
+    status = (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_GET_STATS, stats_local,
                                                sizeof(sx126x_stats_lora_t));
 
     if (status == SX126X_STATUS_OK) {
@@ -946,30 +937,30 @@ sx126x_status_t sx126x_get_lora_stats(const void *context, sx126x_stats_lora_t *
     return status;
 }
 
-sx126x_status_t sx126x_reset_stats(const void *context)
+sx126x_status_t sx126x_reset_stats()
 {
     const uint8_t buf[SX126X_SIZE_RESET_STATS] = {
             SX126X_RESET_STATS, SX126X_NOP, SX126X_NOP, SX126X_NOP, SX126X_NOP, SX126X_NOP, SX126X_NOP,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_RESET_STATS, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_RESET_STATS, 0, 0);
 }
 
 //
 // Miscellaneous
 //
 
-sx126x_status_t sx126x_reset(const void *context)
+sx126x_status_t sx126x_reset()
 {
-    return (sx126x_status_t) sx126x_hal_reset(context);
+    return (sx126x_status_t) sx126x_hal_reset();
 }
 
-sx126x_status_t sx126x_wakeup(const void *context)
+sx126x_status_t sx126x_wakeup()
 {
-    return (sx126x_status_t) sx126x_hal_wakeup(context);
+    return (sx126x_status_t) sx126x_hal_wakeup();
 }
 
-sx126x_status_t sx126x_get_device_errors(const void *context, sx126x_errors_mask_t *errors)
+sx126x_status_t sx126x_get_device_errors(sx126x_errors_mask_t *errors)
 {
     const uint8_t buf[SX126X_SIZE_GET_DEVICE_ERRORS] = {
             SX126X_GET_DEVICE_ERRORS,
@@ -978,7 +969,7 @@ sx126x_status_t sx126x_get_device_errors(const void *context, sx126x_errors_mask
     uint8_t errors_local[sizeof(sx126x_errors_mask_t)] = {0x00};
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
-    status = (sx126x_status_t) sx126x_hal_read(context, buf, SX126X_SIZE_GET_DEVICE_ERRORS, errors_local,
+    status = (sx126x_status_t) sx126x_hal_read(buf, SX126X_SIZE_GET_DEVICE_ERRORS, errors_local,
                                                sizeof(sx126x_errors_mask_t));
 
     if (status == SX126X_STATUS_OK) {
@@ -988,7 +979,7 @@ sx126x_status_t sx126x_get_device_errors(const void *context, sx126x_errors_mask
     return status;
 }
 
-sx126x_status_t sx126x_clear_device_errors(const void *context)
+sx126x_status_t sx126x_clear_device_errors()
 {
     const uint8_t buf[SX126X_SIZE_CLR_DEVICE_ERRORS] = {
             SX126X_CLR_DEVICE_ERRORS,
@@ -996,10 +987,10 @@ sx126x_status_t sx126x_clear_device_errors(const void *context)
             SX126X_NOP,
     };
 
-    return (sx126x_status_t) sx126x_hal_write(context, buf, SX126X_SIZE_CLR_DEVICE_ERRORS, 0, 0);
+    return (sx126x_status_t) sx126x_hal_write(buf, SX126X_SIZE_CLR_DEVICE_ERRORS, 0, 0);
 }
 
-sx126x_status_t sx126x_get_gfsk_bw_param(const uint32_t bw, uint8_t *param)
+sx126x_status_t sx126x_get_gfsk_bw_param(uint32_t bw, uint8_t *param)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
 
@@ -1057,13 +1048,12 @@ uint32_t sx126x_get_lora_bw_in_hz(sx126x_lora_bw_t bw)
     return bw_in_hz;
 }
 
-uint32_t sx126x_get_lora_time_on_air_numerator(const sx126x_pkt_params_lora_t *pkt_p,
-                                               const sx126x_mod_params_lora_t *mod_p)
+uint32_t sx126x_get_lora_time_on_air_numerator(sx126x_pkt_params_lora_t *pkt_p, sx126x_mod_params_lora_t *mod_p)
 {
     const int32_t pld_len_in_bytes = pkt_p->pld_len_in_bytes;
     const int32_t sf = mod_p->sf;
     const bool pld_is_fix = pkt_p->header_type == SX126X_LORA_PKT_IMPLICIT;
-    const int32_t cr_denom = mod_p->cr + 4;
+    int32_t cr_denom = mod_p->cr + 4;
 
     int32_t ceil_denominator;
     int32_t ceil_numerator =
@@ -1096,8 +1086,7 @@ uint32_t sx126x_get_lora_time_on_air_numerator(const sx126x_pkt_params_lora_t *p
     return (uint32_t) ((4 * intermed + 1) * (1 << (sf - 2)));
 }
 
-uint32_t sx126x_get_lora_time_on_air_in_ms(const sx126x_pkt_params_lora_t *pkt_p,
-                                           const sx126x_mod_params_lora_t *mod_p)
+uint32_t sx126x_get_lora_time_on_air_in_ms(sx126x_pkt_params_lora_t *pkt_p, sx126x_mod_params_lora_t *mod_p)
 {
     uint32_t numerator = 1000U * sx126x_get_lora_time_on_air_numerator(pkt_p, mod_p);
     uint32_t denominator = sx126x_get_lora_bw_in_hz(mod_p->bw);
@@ -1105,7 +1094,7 @@ uint32_t sx126x_get_lora_time_on_air_in_ms(const sx126x_pkt_params_lora_t *pkt_p
     return (numerator + denominator - 1) / denominator;
 }
 
-uint32_t sx126x_get_gfsk_time_on_air_numerator(const sx126x_pkt_params_gfsk_t *pkt_p)
+uint32_t sx126x_get_gfsk_time_on_air_numerator(sx126x_pkt_params_gfsk_t *pkt_p)
 {
     return pkt_p->preamble_len_in_bits + (pkt_p->header_type == SX126X_GFSK_PKT_VAR_LEN ? 8 : 0) +
            pkt_p->sync_word_len_in_bits +
@@ -1114,8 +1103,7 @@ uint32_t sx126x_get_gfsk_time_on_air_numerator(const sx126x_pkt_params_gfsk_t *p
                    << 3);
 }
 
-uint32_t sx126x_get_gfsk_time_on_air_in_ms(const sx126x_pkt_params_gfsk_t *pkt_p,
-                                           const sx126x_mod_params_gfsk_t *mod_p)
+uint32_t sx126x_get_gfsk_time_on_air_in_ms(sx126x_pkt_params_gfsk_t *pkt_p, sx126x_mod_params_gfsk_t *mod_p)
 {
     uint32_t numerator = 1000U * sx126x_get_gfsk_time_on_air_numerator(pkt_p);
     uint32_t denominator = mod_p->br_in_bps;
@@ -1124,7 +1112,7 @@ uint32_t sx126x_get_gfsk_time_on_air_in_ms(const sx126x_pkt_params_gfsk_t *pkt_p
     return (numerator + denominator - 1) / denominator;
 }
 
-sx126x_status_t sx126x_get_random_numbers(const void *context, uint32_t *numbers, unsigned int n)
+sx126x_status_t sx126x_get_random_numbers(uint32_t *numbers, uint32_t n)
 {
     sx126x_status_t status;
 
@@ -1133,51 +1121,51 @@ sx126x_status_t sx126x_get_random_numbers(const void *context, uint32_t *numbers
     uint8_t tmp = 0x00;
 
     // Configure for random number generation
-    status = sx126x_read_register(context, SX126X_REG_ANA_LNA, &tmp_ana_lna, 1);
+    status = sx126x_read_register(SX126X_REG_ANA_LNA, &tmp_ana_lna, 1);
     if (status != SX126X_STATUS_OK) {
         return status;
     }
     tmp = tmp_ana_lna & ~(1 << 0);
-    status = sx126x_write_register(context, SX126X_REG_ANA_LNA, &tmp, 1);
+    status = sx126x_write_register(SX126X_REG_ANA_LNA, &tmp, 1);
     if (status != SX126X_STATUS_OK) {
         return status;
     }
 
-    status = sx126x_read_register(context, SX126X_REG_ANA_MIXER, &tmp_ana_mixer, 1);
+    status = sx126x_read_register(SX126X_REG_ANA_MIXER, &tmp_ana_mixer, 1);
     if (status != SX126X_STATUS_OK) {
         return status;
     }
     tmp = tmp_ana_mixer & ~(1 << 7);
-    status = sx126x_write_register(context, SX126X_REG_ANA_MIXER, &tmp, 1);
+    status = sx126x_write_register(SX126X_REG_ANA_MIXER, &tmp, 1);
     if (status != SX126X_STATUS_OK) {
         return status;
     }
 
     // Start RX continuous
-    status = sx126x_set_rx_with_timeout_in_rtc_step(context, SX126X_RX_CONTINUOUS);
+    status = sx126x_set_rx_with_timeout_in_rtc_step(SX126X_RX_CONTINUOUS);
     if (status != SX126X_STATUS_OK) {
         return status;
     }
 
     // Store values
     for (unsigned int i = 0; i < n; i++) {
-        status = sx126x_read_register(context, SX126X_REG_RNGBASEADDRESS, (uint8_t *) &numbers[i], 4);
+        status = sx126x_read_register(SX126X_REG_RNGBASEADDRESS, (uint8_t *) &numbers[i], 4);
         if (status != SX126X_STATUS_OK) {
             return status;
         }
     }
 
-    status = sx126x_set_standby(context, SX126X_STANDBY_CFG_RC);
+    status = sx126x_set_standby(SX126X_STANDBY_CFG_RC);
     if (status != SX126X_STATUS_OK) {
         return status;
     }
 
     // Restore registers
-    status = sx126x_write_register(context, SX126X_REG_ANA_LNA, &tmp_ana_lna, 1);
+    status = sx126x_write_register(SX126X_REG_ANA_LNA, &tmp_ana_lna, 1);
     if (status != SX126X_STATUS_OK) {
         return status;
     }
-    status = sx126x_write_register(context, SX126X_REG_ANA_MIXER, &tmp_ana_mixer, 1);
+    status = sx126x_write_register(SX126X_REG_ANA_MIXER, &tmp_ana_mixer, 1);
 
     return status;
 }
@@ -1206,134 +1194,132 @@ uint32_t sx126x_convert_timeout_in_ms_to_rtc_step(uint32_t timeout_in_ms)
 // Registers access
 //
 
-sx126x_status_t sx126x_cfg_rx_boosted(const void *context, const bool state)
+sx126x_status_t sx126x_cfg_rx_boosted(bool state)
 {
     if (state == true) {
-        return sx126x_write_register(context, SX126X_REG_RXGAIN, (const uint8_t[]) {0x96}, 1);
+        return sx126x_write_register(SX126X_REG_RXGAIN, (uint8_t[]) {0x96}, 1);
     } else {
-        return sx126x_write_register(context, SX126X_REG_RXGAIN, (const uint8_t[]) {0x94}, 1);
+        return sx126x_write_register(SX126X_REG_RXGAIN, (uint8_t[]) {0x94}, 1);
     }
 }
 
-sx126x_status_t sx126x_set_gfsk_sync_word(const void *context, const uint8_t *sync_word, const uint8_t sync_word_len)
+sx126x_status_t sx126x_set_gfsk_sync_word(uint8_t *sync_word, uint8_t sync_word_len)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     uint8_t buf[8] = {0};
 
     if (sync_word_len <= 8) {
         memcpy(buf, sync_word, sync_word_len);
-        status = sx126x_write_register(context, SX126X_REG_SYNCWORDBASEADDRESS, buf, 8);
+        status = sx126x_write_register(SX126X_REG_SYNCWORDBASEADDRESS, buf, 8);
     }
 
     return status;
 }
 
-sx126x_status_t sx126x_set_lora_sync_word(const void *context, const uint8_t sync_word)
+sx126x_status_t sx126x_set_lora_sync_word(uint8_t sync_word)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     uint8_t buffer[2] = {0x00};
 
-    status = sx126x_read_register(context, SX126X_REG_LR_SYNCWORD, buffer, 2);
+    status = sx126x_read_register(SX126X_REG_LR_SYNCWORD, buffer, 2);
 
     if (status == SX126X_STATUS_OK) {
         buffer[0] = (buffer[0] & ~0xF0) + (sync_word & 0xF0);
         buffer[1] = (buffer[1] & ~0xF0) + ((sync_word & 0x0F) << 4);
 
-        status = sx126x_write_register(context, SX126X_REG_LR_SYNCWORD, buffer, 2);
+        status = sx126x_write_register(SX126X_REG_LR_SYNCWORD, buffer, 2);
     }
 
     return status;
 }
 
-sx126x_status_t sx126x_set_gfsk_crc_seed(const void *context, uint16_t seed)
+sx126x_status_t sx126x_set_gfsk_crc_seed(uint16_t seed)
 {
     uint8_t s[] = {(uint8_t) (seed >> 8), (uint8_t) seed};
 
-    return sx126x_write_register(context, SX126X_REG_CRCSEEDBASEADDRESS, s, sizeof(s));
+    return sx126x_write_register(SX126X_REG_CRCSEEDBASEADDRESS, s, sizeof(s));
 }
 
-sx126x_status_t sx126x_set_gfsk_crc_polynomial(const void *context, const uint16_t polynomial)
+sx126x_status_t sx126x_set_gfsk_crc_polynomial(uint16_t polynomial)
 {
     uint8_t poly[] = {(uint8_t) (polynomial >> 8), (uint8_t) polynomial};
 
-    return sx126x_write_register(context, SX126X_REG_CRCPOLYBASEADDRESS, poly, sizeof(poly));
+    return sx126x_write_register(SX126X_REG_CRCPOLYBASEADDRESS, poly, sizeof(poly));
 }
 
-sx126x_status_t sx126x_set_gfsk_whitening_seed(const void *context, const uint16_t seed)
+sx126x_status_t sx126x_set_gfsk_whitening_seed(uint16_t seed)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     uint8_t reg_value = 0;
 
     // The SX126X_REG_WHITSEEDBASEADDRESS @ref LSBit is used for the seed value. The 7 MSBits must not be modified.
     // Thus, we first need to read the current value and then change the LSB according to the provided seed @ref value.
-    status = sx126x_read_register(context, SX126X_REG_WHITSEEDBASEADDRESS, &reg_value, 1);
+    status = sx126x_read_register(SX126X_REG_WHITSEEDBASEADDRESS, &reg_value, 1);
     if (status == SX126X_STATUS_OK) {
         reg_value = (reg_value & 0xFE) | ((uint8_t) (seed >> 8) & 0x01);
-        status = sx126x_write_register(context, SX126X_REG_WHITSEEDBASEADDRESS, &reg_value, 1);
+        status = sx126x_write_register(SX126X_REG_WHITSEEDBASEADDRESS, &reg_value, 1);
         if (status == SX126X_STATUS_OK) {
             reg_value = (uint8_t) seed;
-            status = sx126x_write_register(context, SX126X_REG_WHITSEEDBASEADDRESS + 1, &reg_value, 1);
+            status = sx126x_write_register(SX126X_REG_WHITSEEDBASEADDRESS + 1, &reg_value, 1);
         }
     }
 
     return status;
 }
 
-sx126x_status_t sx126x_cfg_tx_clamp(const void *context)
+sx126x_status_t sx126x_cfg_tx_clamp()
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     uint8_t reg_value = 0x00;
 
-    status = sx126x_read_register(context, SX126X_REG_TX_CLAMP_CFG, &reg_value, 1);
+    status = sx126x_read_register(SX126X_REG_TX_CLAMP_CFG, &reg_value, 1);
 
     if (status == SX126X_STATUS_OK) {
         reg_value |= SX126X_REG_TX_CLAMP_CFG_MASK;
-        status = sx126x_write_register(context, SX126X_REG_TX_CLAMP_CFG, &reg_value, 1);
+        status = sx126x_write_register(SX126X_REG_TX_CLAMP_CFG, &reg_value, 1);
     }
 
     return status;
 }
 
-sx126x_status_t sx126x_stop_rtc(const void *context)
+sx126x_status_t sx126x_stop_rtc()
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     uint8_t reg_value = 0;
 
     reg_value = 0;
-    status = sx126x_write_register(context, SX126X_REG_RTC_CTRL, &reg_value, 1);
+    status = sx126x_write_register(SX126X_REG_RTC_CTRL, &reg_value, 1);
 
     if (status == SX126X_STATUS_OK) {
-        status = sx126x_read_register(context, SX126X_REG_EVT_CLR, &reg_value, 1);
+        status = sx126x_read_register(SX126X_REG_EVT_CLR, &reg_value, 1);
 
         if (status == SX126X_STATUS_OK) {
             reg_value |= SX126X_REG_EVT_CLR_TIMEOUT_MASK;
-            status = sx126x_write_register(context, SX126X_REG_EVT_CLR, &reg_value, 1);
+            status = sx126x_write_register(SX126X_REG_EVT_CLR, &reg_value, 1);
         }
     }
 
     return status;
 }
 
-sx126x_status_t sx126x_set_ocp_value(const void *context, const uint8_t ocp_in_step_of_2_5_ma)
+sx126x_status_t sx126x_set_ocp_value(uint8_t ocp_in_step_of_2_5_ma)
 {
-    return (sx126x_status_t) sx126x_write_register(context, SX126X_REG_OCP, &ocp_in_step_of_2_5_ma, 1);
+    return (sx126x_status_t) sx126x_write_register(SX126X_REG_OCP, &ocp_in_step_of_2_5_ma, 1);
 }
 
-sx126x_status_t sx126x_set_trimming_capacitor_values(const void *context, const uint8_t trimming_cap_xta,
-                                                     const uint8_t trimming_cap_xtb)
+sx126x_status_t sx126x_set_trimming_capacitor_values(uint8_t trimming_cap_xta, uint8_t trimming_cap_xtb)
 {
     uint8_t trimming_capacitor_values[2] = {trimming_cap_xta, trimming_cap_xtb};
 
-    return (sx126x_status_t) sx126x_write_register(context, SX126X_REG_XTATRIM, trimming_capacitor_values, 2);
+    return (sx126x_status_t) sx126x_write_register(SX126X_REG_XTATRIM, trimming_capacitor_values, 2);
 }
 
-sx126x_status_t sx126x_add_registers_to_retention_list(const void *context, const uint16_t *register_addr,
-                                                       uint8_t register_nb)
+sx126x_status_t sx126x_add_registers_to_retention_list(const uint16_t *register_addr, uint8_t register_nb)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     uint8_t buffer[9];
 
-    status = sx126x_read_register(context, SX126X_REG_RETENTION_LIST_BASE_ADDRESS, buffer, 9);
+    status = sx126x_read_register(SX126X_REG_RETENTION_LIST_BASE_ADDRESS, buffer, 9);
 
     if (status == SX126X_STATUS_OK) {
         const uint8_t initial_nb_of_registers = buffer[0];
@@ -1362,31 +1348,31 @@ sx126x_status_t sx126x_add_registers_to_retention_list(const void *context, cons
         }
 
         if (buffer[0] != initial_nb_of_registers) {
-            status = sx126x_write_register(context, SX126X_REG_RETENTION_LIST_BASE_ADDRESS, buffer, 9);
+            status = sx126x_write_register(SX126X_REG_RETENTION_LIST_BASE_ADDRESS, buffer, 9);
         }
     }
 
     return status;
 }
 
-sx126x_status_t sx126x_init_retention_list(const void *context)
+sx126x_status_t sx126x_init_retention_list()
 {
     const uint16_t list_of_registers[3] = {SX126X_REG_RXGAIN, SX126X_REG_TX_MODULATION, SX126X_REG_IQ_POLARITY};
 
-    return sx126x_add_registers_to_retention_list(context, list_of_registers,
+    return sx126x_add_registers_to_retention_list(list_of_registers,
                                                   sizeof(list_of_registers) / sizeof(list_of_registers[0]));
 }
 
-sx126x_status_t sx126x_get_lora_params_from_header(const void *context, sx126x_lora_cr_t *cr, bool *crc_is_on)
+sx126x_status_t sx126x_get_lora_params_from_header(sx126x_lora_cr_t *cr, bool *crc_is_on)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     uint8_t buffer_cr;
     uint8_t buffer_crc;
 
-    status = sx126x_read_register(context, SX126X_REG_LR_HEADER_CR, &buffer_cr, 1);
+    status = sx126x_read_register(SX126X_REG_LR_HEADER_CR, &buffer_cr, 1);
 
     if (status == SX126X_STATUS_OK) {
-        status = sx126x_read_register(context, SX126X_REG_LR_HEADER_CRC, &buffer_crc, 1);
+        status = sx126x_read_register(SX126X_REG_LR_HEADER_CRC, &buffer_crc, 1);
 
         if (status == SX126X_STATUS_OK) {
             *cr = (sx126x_lora_cr_t) ((buffer_cr & SX126X_REG_LR_HEADER_CR_MASK) >> SX126X_REG_LR_HEADER_CR_POS);
@@ -1402,13 +1388,13 @@ sx126x_status_t sx126x_get_lora_params_from_header(const void *context, sx126x_l
  * --- PRIVATE FUNCTIONS DEFINITION --------------------------------------------
  */
 
-static sx126x_status_t sx126x_tx_modulation_workaround(const void *context, sx126x_pkt_type_t pkt_type,
+static sx126x_status_t sx126x_tx_modulation_workaround(sx126x_pkt_type_t pkt_type,
                                                        sx126x_lora_bw_t bw)
 {
     sx126x_status_t status = SX126X_STATUS_ERROR;
     uint8_t reg_value = 0;
 
-    status = sx126x_read_register(context, SX126X_REG_TX_MODULATION, &reg_value, 1);
+    status = sx126x_read_register(SX126X_REG_TX_MODULATION, &reg_value, 1);
 
     if (status == SX126X_STATUS_OK) {
         if (pkt_type == SX126X_PKT_TYPE_LORA) {
@@ -1421,7 +1407,7 @@ static sx126x_status_t sx126x_tx_modulation_workaround(const void *context, sx12
             reg_value |= (1 << 2);  // Bit 2 set to 1 for any (G)FSK configuration
         }
 
-        status = sx126x_write_register(context, SX126X_REG_TX_MODULATION, &reg_value, 1);
+        status = sx126x_write_register(SX126X_REG_TX_MODULATION, &reg_value, 1);
     }
     return status;
 }

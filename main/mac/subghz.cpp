@@ -10,7 +10,7 @@
 extern "C" void SUBGHZ_Radio_IRQHandler()
 {
     sx126x_irq_mask_t irq_status = 0;
-    if (sx126x_get_and_clear_irq_status(nullptr, &irq_status) == SX126X_STATUS_OK) {
+    if (sx126x_get_and_clear_irq_status(&irq_status) == SX126X_STATUS_OK) {
         subghz::last_irq_status = irq_status;
     }
 }
@@ -24,7 +24,7 @@ bool subghz::init()
         return false;
     }
 
-    if (sx126x_set_sleep(nullptr, SX126X_SLEEP_CFG_COLD_START) != SX126X_STATUS_OK) {
+    if (sx126x_set_sleep(SX126X_SLEEP_CFG_COLD_START) != SX126X_STATUS_OK) {
         WLB_LOG("SUBGHZ sleep fail\n");
     }
 
@@ -36,7 +36,7 @@ bool subghz::setup_lora(uint32_t freq_hz, sx126x_lora_sf_t sf, sx126x_lora_bw_t 
 {
     // Step 1. Go standby
     if (pwr_mode != lora::STDBY_RC) {
-        if (sx126x_set_standby(nullptr, SX126X_STANDBY_CFG_RC) != SX126X_STATUS_OK) {
+        if (sx126x_set_standby(SX126X_STANDBY_CFG_RC) != SX126X_STATUS_OK) {
             WLB_LOG("SUBGHZ set standby fail\n");
             return false;
         } else {
@@ -45,17 +45,17 @@ bool subghz::setup_lora(uint32_t freq_hz, sx126x_lora_sf_t sf, sx126x_lora_bw_t 
     }
 
     // Step 2. Packet type = LoRa
-    auto ret = sx126x_set_pkt_type(nullptr, SX126X_PKT_TYPE_LORA);
+    auto ret = sx126x_set_pkt_type(SX126X_PKT_TYPE_LORA);
 
     // Step 3. Recalibration
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_cal(nullptr, SX126X_CAL_ALL));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_cal(SX126X_CAL_ALL));
 
     // Step 4. Set RF frequency & do image calibration
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_rf_freq(nullptr, freq_hz));
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_cal_img_in_mhz(nullptr, img_cal_start_mhz, img_cal_end_mhz));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_rf_freq(freq_hz));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_cal_img_in_mhz(img_cal_start_mhz, img_cal_end_mhz));
 
     // Step 5: Buffer address (override to 0 for now?)
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_buffer_base_address(nullptr, 0, 0));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_buffer_base_address(0, 0));
 
     // Step 6: Set modulation parameters
     sx126x_mod_params_lora_t mod_params = {};
@@ -64,10 +64,10 @@ bool subghz::setup_lora(uint32_t freq_hz, sx126x_lora_sf_t sf, sx126x_lora_bw_t 
     mod_params.sf = sf;
     mod_params.ldro = low_data_rate_opt ? 1 : 0;
 
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_lora_mod_params(nullptr, &mod_params));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_lora_mod_params(&mod_params));
 
     // Step 7: Set sync word
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_lora_sync_word(nullptr, sync_word));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_lora_sync_word(sync_word));
     return ret == SX126X_STATUS_OK;
 }
 
@@ -123,11 +123,11 @@ bool subghz::set_lora_tx(uint8_t *buf, uint8_t len, int8_t tx_power, uint32_t ti
     auto tx_pwr_level = (int8_t)(tx_power > 14 ? tx_power : 14);
     for (uint32_t idx = 0; idx < (sizeof(pa_cfg_lut) / sizeof(lora::pa_cfg_lut_item)); idx += 1) {
         if (pa_cfg_lut[idx].tx_pwr == tx_pwr_level) {
-            ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_pa_cfg(nullptr, &pa_cfg_lut[idx].pa_cfg));
+            ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_pa_cfg(&pa_cfg_lut[idx].pa_cfg));
         }
     }
 
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_tx_params(nullptr, tx_power, SX126X_RAMP_3400_US)); // RampTime = 0x7 - need review
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_tx_params(tx_power, SX126X_RAMP_3400_US)); // RampTime = 0x7 - need review
 
     sx126x_pkt_params_lora_t pkt_params = {};
     pkt_params.crc_is_on = crc_on;
@@ -135,14 +135,14 @@ bool subghz::set_lora_tx(uint8_t *buf, uint8_t len, int8_t tx_power, uint32_t ti
     pkt_params.header_type = header_en ? SX126X_LORA_PKT_EXPLICIT : SX126X_LORA_PKT_IMPLICIT;
     pkt_params.preamble_len_in_symb = preamble_cnt;
     pkt_params.pld_len_in_bytes = len;
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_lora_pkt_params(nullptr, &pkt_params));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_lora_pkt_params(&pkt_params));
 
     uint16_t dio_masks = SX126X_IRQ_TX_DONE | SX126X_IRQ_TIMEOUT;
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_dio_irq_params(nullptr, dio_masks, dio_masks, 0, 0));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_dio_irq_params(dio_masks, dio_masks, 0, 0));
 
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_write_buffer(nullptr, 0, buf, len));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_write_buffer(0, buf, len));
 
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_tx(nullptr, timeout_ms));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_tx(timeout_ms));
     pwr_mode = lora::TX;
     return ret == SX126X_STATUS_OK;
 }
@@ -155,14 +155,14 @@ bool subghz::set_lora_rx(uint8_t len, uint32_t timeout_ms, uint16_t preamble_cnt
     pkt_params.header_type = header_en ? SX126X_LORA_PKT_EXPLICIT : SX126X_LORA_PKT_IMPLICIT;
     pkt_params.preamble_len_in_symb = preamble_cnt;
     pkt_params.pld_len_in_bytes = len;
-    auto ret = sx126x_set_lora_pkt_params(nullptr, &pkt_params);
+    auto ret = sx126x_set_lora_pkt_params(&pkt_params);
 
     uint16_t dio_masks = SX126X_IRQ_RX_DONE | SX126X_IRQ_TIMEOUT;
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_dio_irq_params(nullptr, dio_masks, dio_masks, 0, 0));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_dio_irq_params(dio_masks, dio_masks, 0, 0));
 
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_cfg_rx_boosted(nullptr, rx_boost));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_cfg_rx_boosted(rx_boost));
 
-    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_rx(nullptr, timeout_ms));
+    ret = static_cast<sx126x_status_t>(ret ? ret : sx126x_set_rx(timeout_ms));
     pwr_mode = lora::RX;
     return ret == SX126X_STATUS_OK;
 }
@@ -174,7 +174,7 @@ bool subghz::read_rx_buf(uint8_t *buf, uint8_t len, uint8_t *actual_len)
     }
 
     sx126x_rx_buffer_status_t buf_status = {};
-    auto ret = sx126x_get_rx_buffer_status(nullptr, &buf_status);
+    auto ret = sx126x_get_rx_buffer_status(&buf_status);
     if (ret != SX126X_STATUS_OK) {
         return false;
     }
@@ -184,7 +184,7 @@ bool subghz::read_rx_buf(uint8_t *buf, uint8_t len, uint8_t *actual_len)
     }
 
     uint8_t read_len = std::min(len, buf_status.pld_len_in_bytes);
-    ret = sx126x_read_buffer(nullptr, buf_status.buffer_start_pointer, buf, read_len);
+    ret = sx126x_read_buffer(buf_status.buffer_start_pointer, buf, read_len);
 
     return ret == SX126X_STATUS_OK;
 }
@@ -200,7 +200,7 @@ bool subghz::get_lora_pkt_status(sx126x_pkt_status_lora_t *status)
         return false;
     }
 
-    sx126x_get_lora_pkt_status(nullptr, status);
+    sx126x_get_lora_pkt_status(status);
 
     return true;
 }

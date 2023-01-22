@@ -18,17 +18,27 @@ file(GLOB_RECURSE SX126X_HAL_SRC
         "main/hal/subghz/*.h"
 )
 
+file(GLOB_RECURSE KVED_SRC
+        "external/kved/*.c"
+        "external/kved/*.h"
+)
+
 project(wlboot C CXX ASM)
 
 add_executable(
         wlboot
             "main/stm32wlxx_it.c" "main/stm32wlxx_it.h"
             "main/startup_stm32wle5xx.s" "main/system_stm32wlxx.c"
-            ${STM32_HAL_SRC} ${SX126X_HAL_SRC}
+            ${STM32_HAL_SRC} ${SX126X_HAL_SRC} ${KVED_SRC}
+            "main/hal/clock_setup.c" "main/hal/clock_setup.h"
             "main/main.cpp" "main/misc.hpp"
             "external/logging/log.c" "external/logging/log.h"
             "main/hal/uart.hpp"
             "main/hal/lpuart.cpp" "main/hal/lpuart.hpp"
+            "main/hal/flash_ll.c" "main/hal/flash_ll.h"
+            "main/hal/i2c.cpp" "main/hal/i2c.hpp"
+            "main/hal/rtc_bin.c" "main/hal/rtc_bin.h"
+            "main/helper/soft_timer.cpp" "main/helper/soft_timer.hpp"
             "main/mac/subghz.cpp" "main/mac/subghz.hpp"
             "main/mac/uart_cmd.cpp" "main/mac/uart_cmd.hpp"
             "external/lfbb/lfbb.hpp" "external/lfbb/lfbb_impl.hpp"
@@ -38,6 +48,7 @@ target_include_directories(wlboot PUBLIC
         "external/driver/Inc"
         "external/CMSIS/Device/ST/STM32WLxx/Include" "external/CMSIS/Include"
         "main" "external/logging" "external/logging/printf" "external/lfbb"
+        "external/kved"
         "main/hal" "main/mac"
 )
 
@@ -106,6 +117,13 @@ else()
             STM32WLE5xx=1
             USE_FULL_LL_DRIVER=1
     )
+endif()
+
+if (STM32WL_HAS_TCXO MATCHES 1)
+    message(STATUS "wlboot: TCXO enabled")
+    target_compile_definitions(wlboot PUBLIC STM32WL_HAS_TCXO=1)
+elseif()
+    message(STATUS "wlboot: TCXO disabled")
 endif()
 
 set(linker_script "misc/stm32wle5.ld")
