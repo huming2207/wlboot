@@ -156,7 +156,7 @@ bool uart_cmd::handle_pkt()
     uint16_t actual_crc = crc_16(decoded_buf, decoded_len);
 
     if (origin_crc != actual_crc) {
-        WLB_LOG("CRC mismatched: 0x%04x vs 0x%04x", origin_crc, actual_crc);
+        RS_LOGN("CRC mismatched: 0x%04x vs 0x%04x", origin_crc, actual_crc);
         send_nack_pkt();
         return false;
     }
@@ -174,10 +174,10 @@ bool uart_cmd::handle_pkt()
 
         case cmd_def::UART_OP_LORA_CFG: {
             if (handle_lora_cfg(decoded_buf + sizeof(cmd_def::uart_pkt_header), decoded_len - sizeof(cmd_def::uart_pkt_header))) {
-                WLB_LOG("LoRa cfg ok");
+                RS_LOGN("LoRa cfg ok");
                 send_ack_pkt();
             } else {
-                WLB_LOG("LoRa cfg error");
+                RS_LOGN("LoRa cfg error");
                 send_nack_pkt();
             }
 
@@ -186,22 +186,22 @@ bool uart_cmd::handle_pkt()
 
         case cmd_def::UART_OP_SEND_LORA_PKT: {
             if (handle_lora_tx(decoded_buf + sizeof(cmd_def::uart_pkt_header), decoded_len - sizeof(cmd_def::uart_pkt_header))) {
-                WLB_LOG("LoRa Tx ok");
+                RS_LOGN("LoRa Tx ok");
                 send_ack_pkt();
             } else {
-                WLB_LOG("LoRa Tx error");
+                RS_LOGN("LoRa Tx error");
                 send_nack_pkt();
             }
 
             break;
         }
 
-        case cmd_def::UART_OP_RESET_RADIO: {
+        case cmd_def::UART_OP_RADIO_RESET: {
             break;
         }
 
         default: {
-            WLB_LOG("Unknown opcode: 0x%02x\n", header->opcode);
+            RS_LOGN("Unknown opcode: 0x%02x", header->opcode);
             send_nack_pkt();
             break;
         }
@@ -213,12 +213,12 @@ bool uart_cmd::handle_pkt()
 bool uart_cmd::handle_lora_cfg(void *offset, size_t len)
 {
     if (len < sizeof(cmd_def::uart_lora_cfg_pkt) || offset == nullptr) {
-        WLB_LOG("LoRa cfg pkt len err: %u\n", len);
+        RS_LOGN("LoRa cfg pkt len err: %u", len);
         return false;
     }
 
     auto *pkt = (cmd_def::uart_lora_cfg_pkt *)offset;
-    WLB_LOG("LoRa cfg: BW=%u @ SF=%u, CR=%u; Freq=%lu; LDRO=%u; sw=0x%x", pkt->bw, pkt->sf, pkt->cr, pkt->freq_hz, pkt->ldro, pkt->sync_word);
+    RS_LOGN("LoRa cfg: BW=%u @ SF=%u, CR=%u; Freq=%lu; LDRO=%u; sw=0x%x", pkt->bw, pkt->sf, pkt->cr, pkt->freq_hz, pkt->ldro, pkt->sync_word);
 
     return lora->setup_lora(pkt->freq_hz, (sx126x_lora_sf_t)pkt->sf, (sx126x_lora_bw_t)pkt->bw, pkt->ldro != 0, (sx126x_lora_cr_t)pkt->cr, pkt->sync_word);;
 }
@@ -226,13 +226,13 @@ bool uart_cmd::handle_lora_cfg(void *offset, size_t len)
 bool uart_cmd::handle_lora_tx(void *offset, size_t len)
 {
     if (len < (sizeof(cmd_def::uart_tx_pkt) - sizeof(cmd_def::uart_tx_pkt::buf)) || offset == nullptr) {
-        WLB_LOG("LoRa tx pkt len err: %u\n", len);
+        RS_LOGN("LoRa tx pkt len err: %u", len);
         return false;
     }
 
     auto *pkt = (cmd_def::uart_tx_pkt *)offset;
-    WLB_LOG("LoRa Tx len=%u @ PWR=%d; timeout=%lu, preamble=%u; header=%u, crc=%u, invert_iq=%u",
-            pkt->len, pkt->tx_pwr, pkt->timeout_ms, pkt->preamble_cnt, pkt->header_en, pkt->crc_on, pkt->invert_iq);
+    RS_LOGN("LoRa Tx len=%u @ PWR=%d; timeout=%lu, preamble=%u; header=%u, crc=%u, invert_iq=%u",
+           pkt->len, pkt->tx_pwr, pkt->timeout_ms, pkt->preamble_cnt, pkt->header_en, pkt->crc_on, pkt->invert_iq);
 
     return lora->set_lora_tx(pkt->buf, pkt->len, pkt->tx_pwr, pkt->timeout_ms, pkt->preamble_cnt,
                              pkt->header_en != 0, pkt->crc_on != 0, pkt->invert_iq != 0);

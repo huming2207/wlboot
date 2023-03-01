@@ -20,15 +20,15 @@ volatile sx126x_irq_mask_t subghz::last_irq_status = 0;
 bool subghz::init()
 {
     if (!stm32wl_subghz_init()) {
-        WLB_LOG("SUBGHZ init fail\n");
+        RS_LOGN("SUBGHZ init fail");
         return false;
     }
 
     if (sx126x_set_sleep(SX126X_SLEEP_CFG_COLD_START) != SX126X_STATUS_OK) {
-        WLB_LOG("SUBGHZ sleep fail\n");
+        RS_LOGN("SUBGHZ sleep fail");
     }
 
-    WLB_LOG("SUBGHZ init OK\n");
+    RS_LOGN("SUBGHZ init OK");
     return true;
 }
 
@@ -37,7 +37,7 @@ bool subghz::setup_lora(uint32_t freq_hz, sx126x_lora_sf_t sf, sx126x_lora_bw_t 
     // Step 1. Go standby
     if (pwr_mode != lora::STDBY_RC) {
         if (sx126x_set_standby(SX126X_STANDBY_CFG_RC) != SX126X_STATUS_OK) {
-            WLB_LOG("SUBGHZ set standby fail\n");
+            RS_LOGN("SUBGHZ set standby fail");
             return false;
         } else {
             pwr_mode = lora::STDBY_RC;

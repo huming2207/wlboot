@@ -21,9 +21,10 @@ namespace cmd_def
         // Device setup
         UART_OP_PING = 0x01, // From host
         UART_OP_DEVICE_INFO = 0x02, // To host
-        UART_OP_LORA_CFG = 0x03,
-        UART_OP_LORA_ADV_CFG = 0x04,
-        UART_OP_RESET_RADIO = 0x05,
+        UART_OP_RADIO_RESET = 0x03,
+        UART_OP_SYS_RESET = 0x04,
+        UART_OP_LORA_CFG = 0x05,
+        UART_OP_LORA_ADV_CFG = 0x06,
 
         // LoRa stuff
         UART_OP_SEND_LORA_PKT = 0x10, // From host -> SUBGHZ -> Air
