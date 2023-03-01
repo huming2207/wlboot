@@ -5,6 +5,7 @@
 #include <stm32wlxx_ll_utils.h>
 
 #include "clock_setup.h"
+#include "log.h"
 
 void setup_flash_latency()
 {
@@ -74,4 +75,8 @@ void clock_init()
     setup_high_speed_clk();
     setup_low_speed_clk();
     setup_system_clk();
+
+#ifndef DISABLE_LOG
+    logger_init();
+#endif
 }
