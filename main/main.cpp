@@ -4,6 +4,7 @@
 #include "kved.h"
 #include "flash_ll.h"
 #include "clock_setup.h"
+#include "stm32wlxx_ll_utils.h"
 
 #include <lpuart.hpp>
 
@@ -13,10 +14,6 @@ extern "C" void initialise_monitor_handles(void);
 
 int main()
 {
-#ifndef DISABLE_LOG
-    initialise_monitor_handles();
-#endif
-
     clock_init();
     auto *uart = lpuart::instance();
     auto *lora= subghz::instance();
@@ -25,7 +22,7 @@ int main()
     lora->init();
 
     if (!lora->setup_lora(918000000, SX126X_LORA_SF7, SX126X_LORA_BW_125, false)) {
-        WLB_LOG("LoRa mode init failed");
+        RS_LOGN("LoRa mode init failed");
     }
 
     uint8_t buf[8] = { 0xca, 0xfe, 0xbe, 0xef, 0x5a, 0xa5, 0xaa, 0x55 };
