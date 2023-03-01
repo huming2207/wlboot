@@ -188,3 +188,81 @@ FLASH_RAM_FUNC uint64_t stm32wl_flash_read_word(uint32_t addr)
 {
     return *((uint64_t *)addr);
 }
+
+FLASH_RAM_FUNC bool stm32wl_flash_write_buf(uint32_t addr, uint8_t *buf, uint32_t size)
+{
+    stm32wl_flash_wait();
+
+    // Check suspend operations
+    if (READ_BIT(FLASH->SR, FLASH_SR_PESD) != 0) {
+        return false;
+    }
+
+    stm32wl_flash_unlock();
+    stm32wl_icache_disable();
+    stm32wl_dcache_disable();
+
+    stm32wl_flash_wait();
+    if (stm32wl_flash_check_error()) {
+        return false;
+    }
+
+    // Enable programming
+    SET_BIT(FLASH->CR, FLASH_CR_PG);
+
+    volatile uint32_t buf_left = size;
+    volatile uint32_t curr_addr = addr;
+    volatile uint8_t *buf_ptr = buf;
+    while (buf_left > 0) {
+        if (buf_left >= 8) {
+            stm32wl_flash_wait();
+
+            *(volatile uint32_t*)curr_addr = *((uint32_t *)buf_ptr);
+            __ISB(); // Make sure the program operation is in correct order
+            *(volatile uint32_t*)(curr_addr + 4U) = *((uint32_t *)(buf_ptr + 4));
+
+            curr_addr += 8;
+            buf_ptr += 8;
+            buf_left -= 8;
+
+            stm32wl_flash_wait();
+        } else {
+            volatile uint8_t round_buf[8] = {};
+            for (uint32_t idx = 0; idx < buf_left; idx += 1) {
+                round_buf[idx] = *((uint8_t *)buf_ptr);
+                buf_ptr += 1;
+            }
+
+            for (uint32_t idx = 0; idx < (8 - buf_left); idx += 1) {
+                round_buf[idx + buf_left] = 0xff; // Fill 0xff for unused bytes
+            }
+
+            stm32wl_flash_wait();
+
+            *(volatile uint32_t*)curr_addr = *((uint32_t *)round_buf);
+            __ISB(); // Make sure the program operation is in correct order
+            *(volatile uint32_t*)(curr_addr + 4U) = *((uint32_t *)(round_buf + 4));
+
+            stm32wl_flash_wait();
+            buf_left = 0;
+        }
+    }
+
+    stm32wl_flash_wait();
+
+    // End of program
+    bool success = false;
+    if (READ_BIT(FLASH->SR, FLASH_SR_EOP) != 0) {
+        SET_BIT(FLASH->SR, FLASH_SR_EOP);
+        success = true;
+    } else {
+        success = false;
+    }
+
+    CLEAR_BIT(FLASH->CR, FLASH_CR_PG);
+    stm32wl_icache_enable();
+    stm32wl_dcache_enable();
+    stm32wl_flash_lock();
+
+    return success;
+}
