@@ -41,7 +41,8 @@ add_executable(
             "main/mac/subghz.cpp" "main/mac/subghz.hpp"
             "main/mac/uart_cmd.cpp" "main/mac/uart_cmd.hpp"
             "external/lfbb/lfbb.hpp" "external/lfbb/lfbb_impl.hpp"
-        )
+            "external/logging/printf/printf.c" "external/logging/printf/printf.h"
+)
 
 target_include_directories(wlboot PUBLIC
         "external/driver/Inc"
@@ -62,8 +63,8 @@ if (CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
     target_link_options(wlboot PUBLIC
             -T${CMAKE_CURRENT_LIST_DIR}/misc/stm32wle5.ld
             -Wl,-Map=\"${PROJECT_NAME}.map\"
-            -lc -lrdimon --specs=rdimon.specs -flto -Os
-            -Wl,--gc-sections
+            -lc -flto -Os
+            -Wl,--gc-sections -specs=nano.specs -specs=nosys.specs
             -mthumb -mcpu=cortex-m4 -mfloat-abi=soft
     )
 
@@ -106,8 +107,8 @@ else()
             -Og
             -T${CMAKE_CURRENT_LIST_DIR}/misc/stm32wle5.ld
             -Wl,-Map=\"${PROJECT_NAME}.map\"
-            --specs=rdimon.specs -lc -lrdimon
-            -Wl,--gc-sections --specs=nano.specs
+            -lc
+            -Wl,--gc-sections -specs=nano.specs -specs=nosys.specs
             -mthumb -mcpu=cortex-m4 -mfloat-abi=soft
     )
 
@@ -129,4 +130,6 @@ set(linker_script "misc/stm32wle5.ld")
 set_target_properties(wlboot PROPERTIES SUFFIX ".elf")
 add_custom_command(TARGET wlboot POST_BUILD
         COMMAND arm-none-eabi-size --format=berkeley --totals "$<TARGET_FILE:wlboot>"
+        COMMAND ${CMAKE_OBJCOPY} -Oihex "$<TARGET_FILE:wlboot>" firmware.hex
+        COMMAND ${CMAKE_OBJCOPY} -Obinary "$<TARGET_FILE:wlboot>" firmware.bin
         COMMENT "Invoking: Cross ARM GNU Print Size")
